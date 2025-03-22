@@ -22,6 +22,7 @@ def transaction_detail(request, id):
 
 # ========== API LẤY GIÁ CỔ PHIẾU ======================= 
 @api_view(['GET'])
+@permission_classes([IsAuthenticated])
 def stock_price_api(request, stock_code):
     """API lấy giá khớp lệnh của mã chứng khoán"""
     match_price = get_match_price(stock_code)

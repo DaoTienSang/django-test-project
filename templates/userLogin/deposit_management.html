@@ -95,20 +95,20 @@
                 </thead>
                 <tbody>
 
-                    {% for h in history_deposit %}
+                    {% for transaction in history_deposit %}
                     <tr>
-                        <td>{{h.id}}</td>
-                        <td>{{h.time}}</td>
-                        <td>{{h.amount|intcomma}} VND</td>
-                        <td>{{h.description}}</td>
-                        <td class="status {%if h.status == 'P' %}
+                        <td>#POS-{{transaction.id}}</td>
+                        <td>{{transaction.time}}</td>
+                        <td>+ {{transaction.amount|intcomma}} VND</td>
+                        <td>{{transaction.description}}</td>
+                        <td class="status {%if transaction.status == 'P' %}
                                         status-processing
-                                        {% elif h.status == 'C' %}
+                                        {% elif transaction.status == 'C' %}
                                         status-completed
                                         {% else %}
                                         status-cancalled
-                                        {% endif %}"><p>{{h.get_status_display}}</p></td>
-                        <td><button class="btn-detail">Chi tiết</button></td>
+                                        {% endif %}"><p>{{transaction.get_status_display}}</p></td>
+                        <td><button class="btn-detail" data-id="{{ transaction.id }}">Chi tiết</button></td>
                     </tr>
                     {% empty %}
                     <tr>
@@ -203,26 +203,8 @@
             });
         });
 
-        // const addBankLink = document.querySelector('.add-bank-link');
-        // const addBankModal = document.getElementById('add-bank-modal');
-        // const closeButtons = document.querySelectorAll('.close');
         
-        // // Mở modal thêm tài khoản
-        // addBankLink.addEventListener('click', function(e) {
-        //     e.preventDefault();
-        //     addBankModal.style.display = 'block';
-        // });
-        
-        // // Đóng modal
-        // closeButtons.forEach(function(button) {
-        //     button.addEventListener('click', function() {
-        //         addBankModal.style.display = 'none';
-        //         transactionDetailModal.style.display = 'none';
-        //     });
-        // });
-
         const depositForm = document.querySelector('.deposit-form');
-        
         // Ngăn chặn submit mặc định và hiển thị modal
         depositForm.addEventListener('submit', function(e) {
             e.preventDefault();
@@ -290,10 +272,11 @@
                 depositForm.submit();
             });
         }
-        // ======= hàm xem chi tiết nạp tiền
+
+
+        // - Chi tiết nạp tiền
         const detailButtons = document.querySelectorAll('.btn-detail');
         const transactionDetailModal = document.getElementById('transaction-detail-modal');
-    
         // Xử lý nút chi tiết
         detailButtons.forEach(function(button) {
             button.addEventListener('click', function() {
@@ -325,6 +308,56 @@
             const seconds = String(date.getSeconds()).padStart(2, '0');
     
             return `${year}-${month}-${day} ${hours}:${minutes}:${seconds}`;
+        }
+        // Hàm lấy chi tiết giao dịch
+        function fetchTransactionDetail(id) {
+            // Lấy chi tiết từ api
+            fetch(`/api/transaction/${id}/`)
+                .then(response => response.json())
+                .then(data => {
+                    const contentDiv = document.getElementById('transaction-detail-content');
+                    contentDiv.innerHTML = `
+                        <div class="detail-item">
+                            <span class="label">Mã giao dịch:</span>
+                            <span class="value">#POS-${data.id}</span>
+                        </div>
+                        <div class="detail-item">
+                            <span class="label">Ngày giao dịch:</span>
+                            <span class="value">${formatISODate(data.time)}</span>
+                        </div>
+                        <div class="detail-item">
+                            <span class="label">Số tiền:</span>
+                            <span class="value">+ ${data.amount.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ",")} VND</span>
+                        </div>
+                        <div class="detail-item">
+                            <span class="label">Số tiền còn lại:</span>
+                            <span class="value">${data.balance_after.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ",")} VND</span>
+                        </div>
+                        <div class="detail-item">
+                            <span class="label">Ngân hàng:</span>
+                            <span class="value">${data.bank_info.bank_name}</span>
+                        </div>
+                        <div class="detail-item">
+                            <span class="label">Số tài khoản:</span>
+                            <span class="value">${data.bank_info.account_number}</span>
+                        </div>
+                        <div class="detail-item">
+                            <span class="label">Tên chủ tài khoản:</span>
+                            <span class="value">${data.bank_info.account_name}</span>
+                        </div>
+                        <div class="detail-item">
+                            <span class="label">Trạng thái:</span>
+                            <span class="value status-${data.status.toLowerCase()}">${data.status_display}</span>
+                        </div>
+                        <div class="detail-item">
+                            <span class="label">Ghi chú:</span>
+                            <span class="value">${data.description || 'Không có'}</span>
+                        </div>
+                    `;
+                })
+                .catch(error => {
+                    console.error('Error fetching transaction details:', error);
+                });
         }
     });
 
