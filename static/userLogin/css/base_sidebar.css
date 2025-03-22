@@ -1,0 +1,314 @@
+/* Reset CSS và CSS chung */
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+}
+
+body {
+    background-color: #f8f9fa;
+    color: #333;
+}
+
+.container {
+    display: grid;
+    grid-template-columns: 250px 1fr;
+    grid-template-rows: 70px 1fr;
+    grid-template-areas: 
+        "header header"
+        "sidebar main";
+    min-height: 100vh;
+}
+
+a {
+    text-decoration: none;
+    color: inherit;
+}
+
+/* Header */
+.header {
+    grid-area: header;
+    background-color: #ffffff;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 0 20px;
+    box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+    position: fixed;
+    width: 100%;
+    z-index: 100;
+    height: 70px;
+}
+
+.logo-text {
+    font-size: 24px;
+    font-weight: 700;
+}
+
+.logo-text a {
+    color: #2c3e50;
+}
+
+.trade-text {
+    color: #3498db;
+    font-weight: 800;
+}
+
+.account-info {
+    display: flex;
+    align-items: center;
+    gap: 20px;
+}
+
+.logo-user {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    font-weight: 500;
+}
+
+.logo-user img {
+    width: 24px;
+    height: 24px;
+    cursor: text;
+    background-color: rgb(214, 108, 108);
+    border-radius: 50%;
+}
+
+.user-detail {
+    position: relative;
+    cursor: pointer;
+}
+
+.user-detail p {
+    display: flex;
+    align-items: center;
+    gap: 5px;
+    font-weight: 500;
+    padding: 8px 12px;
+    border-radius: 4px;
+    transition: background-color 0.2s;
+}
+
+.user-detail p:hover {
+    background-color: #f1f1f1;
+}
+
+.user-detail img {
+    width: 16px;
+    height: 16px;
+}
+
+.detail-action {
+    position: absolute;
+    top: 100%;
+    right: 0;
+    background-color: #ffffff;
+    border-radius: 4px;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+    min-width: 180px;
+    display: none;
+    z-index: 10;
+}
+
+.user-detail:hover .detail-action {
+    display: block;
+}
+
+.detail-action a {
+    display: block;
+    padding: 12px 16px;
+    border-bottom: 1px solid #f1f1f1;
+    transition: background-color 0.2s;
+}
+
+.detail-action a:last-child {
+    border-bottom: none;
+    color: #e74c3c;
+}
+
+.detail-action a:hover {
+    background-color: #f8f9fa;
+}
+
+/* Sidebar */
+.sidebar {
+    grid-area: sidebar;
+    background-color: #2c3e50;
+    color: #ecf0f1;
+    padding-top: 90px;
+    height: 100vh;
+    position: fixed;
+    width: 250px;
+    box-shadow: 2px 0 5px rgba(0, 0, 0, 0.1);
+}
+
+.menu-item {
+    padding: 0 15px;
+    margin-bottom: 5px;
+    transition: all 0.3s;
+}
+
+.menu-item a {
+    display: flex;
+    align-items: center;
+    padding: 12px 15px;
+    border-radius: 8px;
+    transition: all 0.3s;
+    font-weight: 500;
+}
+
+.menu-item i {
+    margin-right: 12px;
+    font-size: 18px;
+    display: inline-flex;
+    justify-content: center;
+    min-width: 24px;
+}
+
+.menu-item:hover a {
+    background-color: rgba(255, 255, 255, 0.1);
+}
+
+.menu-item.active {
+    margin-left: -5px;
+}
+
+.menu-item.active a {
+    background-color: #3498db;
+    color: white;
+    padding-left: 20px;
+    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+}
+
+/* Main Content Area */
+main {
+    grid-area: main;
+    padding: 90px 30px 30px;
+    /* margin-left: 250px; */
+}
+
+.notification {
+    background-color: #e77471;
+    color: white;
+    padding: 10px 15px;
+    border-radius: 5px;
+    width: 200px;
+    position: fixed;
+    top: 80px;
+    right: 20px;
+    z-index: 1000000000000000;
+}
+
+.notification.hidden {
+    opacity: 0;
+    display: none; /* Ẩn hoàn toàn sau khi mờ dần */
+}
+
+.notification p {
+    margin: 0;
+    font-size: 14px;
+}
+
+.notification p:first-child {
+    font-weight: bold;
+}
+
+
+/* Responsive */
+@media screen and (max-width: 768px) {
+    .container {
+        grid-template-columns: 1fr;
+        grid-template-areas: 
+            "header"
+            "main";
+    }
+    
+    .header {
+        padding: 0 15px;
+    }
+    
+    .sidebar {
+        display: none;
+    }
+    
+    main {
+        margin-left: 0;
+        padding: 90px 15px 15px;
+    }
+}
+
+/* Animation cho dropdown */
+@keyframes fadeIn {
+    from { opacity: 0; transform: translateY(-10px); }
+    to { opacity: 1; transform: translateY(0); }
+}
+
+.detail-action {
+    animation: fadeIn 0.2s ease-out;
+}
+
+/* Style cho JS đóng mở sidebar nếu cần */
+.sidebar-toggle {
+    display: none;
+}
+
+@media screen and (max-width: 768px) {
+    .sidebar-toggle {
+        display: block;
+        position: fixed;
+        bottom: 20px;
+        right: 20px;
+        background-color: #3498db;
+        color: white;
+        width: 50px;
+        height: 50px;
+        border-radius: 50%;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+        z-index: 1000;
+        cursor: pointer;
+    }
+    
+    .sidebar.show {
+        display: block;
+        z-index: 99;
+    }
+}
+
+/* Hiệu ứng ripple cho menu items */
+.menu-item a {
+    position: relative;
+    overflow: hidden;
+}
+
+.ripple {
+    position: absolute;
+    background: rgba(255, 255, 255, 0.3);
+    border-radius: 50%;
+    transform: scale(0);
+    animation: ripple 0.6s linear;
+    pointer-events: none;
+}
+
+@keyframes ripple {
+    to {
+        transform: scale(4);
+        opacity: 0;
+    }
+}
+
+/* CSS cho mobile sidebar toggle */
+@media screen and (max-width: 768px) {
+    .sidebar {
+        transform: translateX(-100%);
+        transition: transform 0.3s ease-in-out;
+    }
+    
+    .sidebar.show {
+        transform: translateX(0);
+    }
+}

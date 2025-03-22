@@ -1,0 +1,45 @@
+làm nộp tiền - rút tiền
+lịch sử nộp tiền / rút
+
+
+
+
+* DB
+
+- USER ACCOUNT:
+	+ id
+	+ username (unique)
+	+ password
+	+ first name
+	+ last name
+	+ email (unique)
+	+ created at
+	+ updated at
+	+ balance (default:0)
+
+
+- USER ASSETS
+	+ user id
+	+ stock code
+	+ amount (>0)
+
+- STOCK Transactions
+	+ id
+	+ user id
+	+ stock code
+	+ status sell (True / False)
+	+ price
+	+ time
+	+ balance after
+	+ amount (>0)
+    + status finish(True/False)
+
+- Wallet Transactions
+	+ id (generate with min length 6 characters)
+	+ user id
+	+ amount (>0)
+	+ status withdraw (True / False)
+	+ time
+	+ description
+	+ balance after
+	+ status finish (Peding/Completed/Failed)

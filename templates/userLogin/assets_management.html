@@ -1,0 +1,243 @@
+{% extends "userLogin/base_sidebar.html" %}
+
+{% load static %}
+
+{% block title %}Quản Lý Tài Sản - SmartTrade{% endblock %}
+
+{% block css %}
+<link rel="stylesheet" href="{% static 'userLogin/css/assets_management.css' %}">
+{% endblock %}
+
+{% block main-content %}
+<main class="dashboard-content">
+    <div class="dashboard-header">
+        <h2>Quản lý Tài sản</h2>
+        <!-- <div class="date-filter">
+            <span>Thời gian:</span>
+            <select>
+                <option>Hôm nay</option>
+                <option>Tuần này</option>
+                <option>Tháng này</option>
+                <option>Năm nay</option>
+            </select>
+        </div> -->
+    </div>
+
+    <!-- Thẻ thống kê -->
+    <div class="stats-cards">
+        <div class="stat-card">
+            <div class="stat-icon">💼</div>
+            <div class="stat-info">
+                <h3>Tổng giá trị danh mục</h3>
+                <p class="stat-value">857,500,000 VND</p>
+                <p class="stat-change increase">+3.8% <span>từ tháng trước</span></p>
+            </div>
+        </div>
+        <div class="stat-card">
+            <div class="stat-icon">💰</div>
+            <div class="stat-info">
+                <h3>Lợi nhuận/Lỗ</h3>
+                <p class="stat-value">32,800,000 VND</p>
+                <p class="stat-change increase">+6.2% <span>từ tháng trước</span></p>
+            </div>
+        </div>
+        <div class="stat-card">
+            <div class="stat-icon">📊</div>
+            <div class="stat-info">
+                <h3>Số mã cổ phiếu</h3>
+                <p class="stat-value">15</p>
+                <p class="stat-change increase">+2 <span>từ tháng trước</span></p>
+            </div>
+        </div>
+        <div class="stat-card">
+            <div class="stat-icon">📈</div>
+            <div class="stat-info">
+                <h3>Cổ phiếu tăng/giảm</h3>
+                <p class="stat-value">11/4</p>
+                <p class="stat-change increase">+5% <span>hiệu suất</span></p>
+            </div>
+        </div>
+    </div>
+
+    <!-- Phân bổ tài sản -->
+    <div class="chart-container">
+        <div class="chart-card">
+            <div class="chart-header">
+                <h2>Phân bổ danh mục đầu tư</h2>
+                <div class="chart-actions">
+                    <button class="btn-chart active">Ngành</button>
+                    <button class="btn-chart">Cổ phiếu</button>
+                    <button class="btn-chart">Rủi ro</button>
+                </div>
+            </div>
+            <div class="chart-body">
+                <!-- Đây là nơi sẽ thêm biểu đồ phân bổ -->
+                <div class="chart-placeholder">
+                    <div class="chart-line"></div>
+                    <div class="chart-line"></div>
+                    <div class="chart-line"></div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Danh sách cổ phiếu -->
+    <div class="recent-transactions">
+        <div class="section-header">
+            <h2>Danh mục cổ phiếu</h2>
+            <a href="#" class="view-all">Thêm cổ phiếu</a>
+        </div>
+        <div class="table-container">
+            <table>
+                <thead>
+                    <tr>
+                        <th>Mã CP</th>
+                        <th>Tên công ty</th>
+                        <th>Ngành</th>
+                        <th>Số lượng</th>
+                        <th>Giá mua</th>
+                        <th>Giá hiện tại</th>
+                        <th>Thay đổi</th>
+                        <th>Giá trị</th>
+                        <th>Lãi/Lỗ</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td>VNM</td>
+                        <td>CTCP Sữa Việt Nam</td>
+                        <td>Thực phẩm</td>
+                        <td>2,000</td>
+                        <td>75,000</td>
+                        <td>82,500</td>
+                        <td class="type-buy">+10.0%</td>
+                        <td>165,000,000 VND</td>
+                        <td class="status-completed">+15,000,000 VND</td>
+                    </tr>
+                    <tr>
+                        <td>FPT</td>
+                        <td>Tập đoàn FPT</td>
+                        <td>Công nghệ</td>
+                        <td>1,500</td>
+                        <td>90,000</td>
+                        <td>98,500</td>
+                        <td class="type-buy">+9.4%</td>
+                        <td>147,750,000 VND</td>
+                        <td class="status-completed">+12,750,000 VND</td>
+                    </tr>
+                    <tr>
+                        <td>MWG</td>
+                        <td>CTCP Thế Giới Di Động</td>
+                        <td>Bán lẻ</td>
+                        <td>1,800</td>
+                        <td>125,000</td>
+                        <td>115,000</td>
+                        <td class="type-sell">-8.0%</td>
+                        <td>207,000,000 VND</td>
+                        <td class="status-pending">-18,000,000 VND</td>
+                    </tr>
+                    <tr>
+                        <td>VIC</td>
+                        <td>Tập đoàn Vingroup</td>
+                        <td>Bất động sản</td>
+                        <td>1,000</td>
+                        <td>105,000</td>
+                        <td>112,500</td>
+                        <td class="type-buy">+7.1%</td>
+                        <td>112,500,000 VND</td>
+                        <td class="status-completed">+7,500,000 VND</td>
+                    </tr>
+                    <tr>
+                        <td>HPG</td>
+                        <td>CTCP Tập đoàn Hòa Phát</td>
+                        <td>Thép</td>
+                        <td>5,000</td>
+                        <td>31,500</td>
+                        <td>33,200</td>
+                        <td class="type-buy">+5.4%</td>
+                        <td>166,000,000 VND</td>
+                        <td class="status-completed">+8,500,000 VND</td>
+                    </tr>
+                    <tr>
+                        <td>VHM</td>
+                        <td>CTCP Vinhomes</td>
+                        <td>Bất động sản</td>
+                        <td>800</td>
+                        <td>80,000</td>
+                        <td>74,500</td>
+                        <td class="type-sell">-6.9%</td>
+                        <td>59,600,000 VND</td>
+                        <td class="status-pending">-4,400,000 VND</td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+    </div>
+
+    <!-- Lịch sử giao dịch -->
+    <div class="recent-transactions">
+        <div class="section-header">
+            <h2>Lịch sử giao dịch gần đây</h2>
+            <a href="#" class="view-all">Xem tất cả</a>
+        </div>
+        <div class="table-container">
+            <table>
+                <thead>
+                    <tr>
+                        <th>Ngày</th>
+                        <th>Mã CP</th>
+                        <th>Loại</th>
+                        <th>Số lượng</th>
+                        <th>Giá</th>
+                        <th>Tổng giá trị</th>
+                        <th>Phí giao dịch</th>
+                        <th>Trạng thái</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td>15/03/2025</td>
+                        <td>VNM</td>
+                        <td class="type-buy">Mua</td>
+                        <td>500</td>
+                        <td>82,500 VND</td>
+                        <td>41,250,000 VND</td>
+                        <td>41,250 VND</td>
+                        <td class="status-completed">Hoàn thành</td>
+                    </tr>
+                    <tr>
+                        <td>14/03/2025</td>
+                        <td>VHM</td>
+                        <td class="type-buy">Mua</td>
+                        <td>300</td>
+                        <td>74,500 VND</td>
+                        <td>22,350,000 VND</td>
+                        <td>22,350 VND</td>
+                        <td class="status-completed">Hoàn thành</td>
+                    </tr>
+                    <tr>
+                        <td>12/03/2025</td>
+                        <td>MSN</td>
+                        <td class="type-sell">Bán</td>
+                        <td>400</td>
+                        <td>98,000 VND</td>
+                        <td>39,200,000 VND</td>
+                        <td>39,200 VND</td>
+                        <td class="status-completed">Hoàn thành</td>
+                    </tr>
+                    <tr>
+                        <td>10/03/2025</td>
+                        <td>FPT</td>
+                        <td class="type-buy">Mua</td>
+                        <td>200</td>
+                        <td>98,500 VND</td>
+                        <td>19,700,000 VND</td>
+                        <td>19,700 VND</td>
+                        <td class="status-completed">Hoàn thành</td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+    </div>
+</main>
+{% endblock %}

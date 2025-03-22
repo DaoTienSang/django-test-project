@@ -1,0 +1,78 @@
+{% load static %}
+
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>{% block title %}{% endblock %}</title>
+    <link rel="stylesheet" href="{% static 'userLogin/css/base_sidebar.css' %}">
+    {% block css %}{% endblock %}
+</head>
+<body>
+    <div class="container">
+        <!-- ============== HEADER ===================== -->
+        <div class="header">
+            <div class="logo-text">
+                <a href="{% url 'news:home' %}">Smart<span class="trade-text">Trade</a></span>
+            </div>
+            <div class="account-info">
+                <div class="logo-user">
+                    <img src="{% static 'IMG/user.svg' %}" alt="">{{user.first_name}} {{user.last_name}}
+                </div>
+                <div class="user-detail">
+                    <p>Chi tiết<img src="{% static 'IMG/chevron-down.svg' %}" alt=""></p>
+                    <div class="detail-action">
+                        <a href="#">Thông tin của tôi</a>
+                        <a href="#">Đổi mật khẩu</a>
+                        <a href="{% url 'accounts:signout' %} " onclick="return confirm('Bạn thực sự muốn đăng xuất.')">Đăng xuất</a>
+                    </div>
+                </div>
+            </div>
+            
+        </div>
+
+        <!-- ========== SIDEBAR ================ -->
+        <div class="sidebar">
+            <div class="menu-item">
+                <a href="{% url 'userLogin:dashboard' %}"><i>📊</i> Bảng điều khiển</a>
+            </div>
+            <div class="menu-item">
+                <a href="{% url 'userLogin:trading' %}"><i>📈</i> Quản lý Mua bán</a>
+            </div>
+            <div class="menu-item">
+                <a href="{% url 'userLogin:assets' %}"><i>💼</i> Quản lý Tài sản</a>
+            </div>
+            <div class="menu-item">
+                <a href="#"><i>🏢</i>Danh mục Theo dõi</a>
+            </div>
+            <div class="menu-item">
+                <a href="{% url 'userLogin:deposit' %}"><i>📥</i> Quản lý Nạp tiền</a>
+            </div>
+            <div class="menu-item">
+                <a href="{% url 'userLogin:withdraw' %}"><i>📤</i> Quản lý Rút tiền</a>
+            </div>
+            <div class="menu-item">
+                <a href="#"><i>📜</i> Lịch sử Giao dịch</a>
+            </div>
+            <div class="menu-item">
+                <a href="#"><i>🎫</i> Hỗ trợ</a>
+            </div>
+            <!-- <div class="menu-item">
+                <a href="#"><i>👥</i> Quản lý Giới thiệu</a>
+            </div> -->
+        </div>
+
+        {% for message in messages %}
+            <div class="notification" id="notification-{{ loop.index }}">
+                <p><i>{{ message }}</i></p>
+            </div>
+        {% endfor %}
+
+        {% block main-content %}{% endblock %}
+    </div>
+
+    <!-- ================= JAVASCRIPTS ========================== -->
+    <script src="{% static 'userLogin/js/base_sidebar.js' %}"></script>
+</body>
+</html>

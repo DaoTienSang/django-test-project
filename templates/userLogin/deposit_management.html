@@ -1,0 +1,334 @@
+{% extends 'userLogin/base_sidebar.html' %}
+
+{% load humanize %}
+{% load static %}
+
+{% block title %}Quản lý Nạp tiền - SmartTrade{% endblock %}
+
+{% block css %}
+<link rel="stylesheet" href="{% static 'userLogin/css/deposit_management.css' %}">
+{% endblock %}
+
+{% block main-content %}
+<main class="deposit-content">
+    <div class="deposit-header">
+        <h2>Quản lý Nạp tiền</h2>
+        <!-- <button class="btn-new-deposit">+ Tạo lệnh nạp mới</button> -->
+    </div>
+
+    
+
+    <!-- Thẻ thông tin ví -->
+    <div class="wallet-info-cards">
+        <div class="wallet-card">
+            <div class="wallet-icon">💰</div>
+            <div class="wallet-details">
+                <h3>Số dư khả dụng</h3>
+                <p class="wallet-amount">{{ user.balance|intcomma}} VND</p>
+            </div>
+        </div>
+        <div class="wallet-card">
+            <div class="wallet-icon">📊</div>
+            <div class="wallet-details">
+                <h3>Tổng nạp tháng này</h3>
+                <p class="wallet-amount">{{amount_deposit_amonth|intcomma}} VND</p>
+            </div>
+        </div>
+    </div>
+
+    <!-- Form nạp tiền -->
+    <div class="deposit-form-container">
+        <div class="form-header">
+            <h3>Thông tin nạp tiền</h3>
+            <!-- <p>Chuyển khoản ngân hàng</p> -->
+        </div>
+        <form class="deposit-form" method="post">
+            {% csrf_token %}
+            <div class="form-group">
+                <label for="deposit-amount">Số tiền nạp (VND)</label>
+                <input name="deposit-amount" type="text" id="deposit-amount" placeholder="Nhập số tiền bạn muốn nạp..." required>
+                <p class="info-text">Số tiền tối thiểu: 100,000 VND</p>
+                <label for="deposit-description">Nội dung</label>
+                <textarea name="deposit-description" id="deposit-description" placeholder="Nhập nội dung nạp tiền..." required></textarea>
+            </div>
+            <div class="form-group">
+                <label for="bank-info">Thông tin tài khoản ngân hàng</label>
+                <select name="bank-info" id="bank-info" required>
+                    <option value="">Chọn tài khoản ngân hàng</option>
+                    {% for bank in user_banks %}
+                    <option value="{{ bank.id }}">{{ bank.bank_name }} - {{ bank.account_number }}</option>
+                    {% endfor %}
+                </select>
+                <a href="#" class="add-bank-link">+ Thêm tài khoản mới</a>
+            </div>
+            
+            <div class="form-actions">
+                <button type="submit" class="btn-submit">Xác nhận nạp</button>
+            </div>
+        </form>
+    </div>
+
+    <!-- Lịch sử nạp tiền -->
+    <div class="deposit-history">
+        <div class="history-header">
+            <h3>Lịch sử nạp tiền</h3>
+            <div class="history-filter">
+                <select>
+                    <option>Tất cả</option>
+                    <option>Hoàn thành</option>
+                    <option>Đang xử lý</option>
+                    <option>Bị hủy</option>
+                </select>
+            </div>
+        </div>
+        <div class="table-container">
+            <table>
+                <thead>
+                    <tr>
+                        <th>Mã giao dịch</th>
+                        <th>Ngày</th>
+                        <th>Số tiền</th>
+                        <th>Nội dung</th>
+                        <th>Trạng thái</th>
+                        <th></th>
+                    </tr>
+                </thead>
+                <tbody>
+
+                    {% for h in history_deposit %}
+                    <tr>
+                        <td>{{h.id}}</td>
+                        <td>{{h.time}}</td>
+                        <td>{{h.amount|intcomma}} VND</td>
+                        <td>{{h.description}}</td>
+                        <td class="status {%if h.status == 'P' %}
+                                        status-processing
+                                        {% elif h.status == 'C' %}
+                                        status-completed
+                                        {% else %}
+                                        status-cancalled
+                                        {% endif %}"><p>{{h.get_status_display}}</p></td>
+                        <td><button class="btn-detail">Chi tiết</button></td>
+                    </tr>
+                    {% empty %}
+                    <tr>
+                        <td colspan="6" class="no-data">Chưa có giao dịch nào</td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+    </div>
+
+    <!-- Modal thêm tài khoản ngân hàng -->
+    <div id="add-bank-modal" class="modal">
+        <div class="modal-content">
+            <span class="close">&times;</span>
+            <h3>Thêm tài khoản ngân hàng</h3>
+            <form id="add-bank-form" method="post" action="{% url 'userLogin:add_bank_account' %}">
+                {% csrf_token %}
+                <div class="form-group">
+                    <label for="bank-name">Tên ngân hàng</label>
+                    <select name="bank-name" id="bank-name" required>
+                        <option value="">Chọn ngân hàng</option>
+                        <option value="Vietcombank">Vietcombank</option>
+                        <option value="BIDV">BIDV</option>
+                        <option value="Techcombank">Techcombank</option>
+                        <option value="VPBank">VPBank</option>
+                        <option value="MB Bank">MB Bank</option>
+                        <option value="ACB">ACB</option>
+                        <option value="TPBank">TPBank</option>
+                        <option value="Sacombank">Sacombank</option>
+                    </select>
+                </div>
+                <div class="form-group">
+                    <label for="account-number">Số tài khoản</label>
+                    <input type="text" id="account-number" name="account-number" required>
+                </div>
+                <div class="form-group">
+                    <label for="account-name">Tên chủ tài khoản</label>
+                    <input type="text" id="account-name" name="account-name" required>
+                </div>
+                <div class="form-actions">
+                    <button type="submit" class="btn-submit">Thêm tài khoản</button>
+                </div>
+            </form>
+        </div>
+    </div>
+    <!-- Modal chi tiết giao dịch -->
+    <div id="transaction-detail-modal" class="modal">
+        <div class="modal-content">
+            <span class="close">&times;</span>
+            <h3>Chi tiết giao dịch</h3>
+            <div id="transaction-detail-content">
+                <!-- Nội dung chi tiết giao dịch sẽ được điền bằng JavaScript -->
+            </div>
+        </div>
+    </div>
+</main>
+
+
+<script>
+    document.addEventListener('DOMContentLoaded', function() {
+        // - Format số tiền khi nhập
+        const withdrawAmountInput = document.getElementById('withdraw-amount');
+        if (withdrawAmountInput) {
+            withdrawAmountInput.addEventListener('input', function(e) {
+                // Xóa tất cả ký tự không phải số
+                let value = this.value.replace(/\D/g, '');
+                // Format với dấu phẩy ngăn cách hàng nghìn
+                if (value) {
+                    this.value = value.replace(/\B(?=(\d{3})+(?!\d))/g, ",");
+                } else {
+                    this.value = '';
+                }
+            });
+        }
+        // - Thêm tài khoản ngân hàng
+        const addBankLink = document.querySelector('.add-bank-link');
+        const addBankModal = document.getElementById('add-bank-modal');
+        const closeButtons = document.querySelectorAll('.close');
+        
+        // Mở modal thêm tài khoản
+        addBankLink.addEventListener('click', function(e) {
+            e.preventDefault();
+            addBankModal.style.display = 'block';
+        });
+        
+        // Đóng modal
+        closeButtons.forEach(function(button) {
+            button.addEventListener('click', function() {
+                addBankModal.style.display = 'none';
+                transactionDetailModal.style.display = 'none';
+            });
+        });
+
+        // const addBankLink = document.querySelector('.add-bank-link');
+        // const addBankModal = document.getElementById('add-bank-modal');
+        // const closeButtons = document.querySelectorAll('.close');
+        
+        // // Mở modal thêm tài khoản
+        // addBankLink.addEventListener('click', function(e) {
+        //     e.preventDefault();
+        //     addBankModal.style.display = 'block';
+        // });
+        
+        // // Đóng modal
+        // closeButtons.forEach(function(button) {
+        //     button.addEventListener('click', function() {
+        //         addBankModal.style.display = 'none';
+        //         transactionDetailModal.style.display = 'none';
+        //     });
+        // });
+
+        const depositForm = document.querySelector('.deposit-form');
+        
+        // Ngăn chặn submit mặc định và hiển thị modal
+        depositForm.addEventListener('submit', function(e) {
+            e.preventDefault();
+            
+            const amount = document.getElementById('deposit-amount').value;
+            const description = document.getElementById('deposit-description').value;
+            
+            // Kiểm tra số tiền hợp lệ
+            const amountValue = parseFloat(amount.replace(/,/g, ''));
+            if (isNaN(amountValue) || amountValue < 100000) {
+                alert('Vui lòng nhập số tiền hợp lệ (tối thiểu 100,000 VND)');
+                return;
+            }
+            
+            // Tạo modal động
+            createConfirmationModal(amount, description);
+        });
+        
+        // Format số tiền khi nhập
+        const depositAmount = document.getElementById('deposit-amount');
+        depositAmount.addEventListener('input', function() {
+            // Loại bỏ tất cả các ký tự không phải số
+            let value = this.value.replace(/[^\d]/g, '');
+            
+            // Format với dấu phẩy ngăn cách hàng nghìn
+            if (value) {
+                this.value = value.replace(/\B(?=(\d{3})+(?!\d))/g, ",");
+            }else {
+                this.value = '';
+            }
+        });
+        
+        // Hàm tạo modal xác nhận
+        function createConfirmationModal(amount, description) {
+            // Tạo các phần tử HTML cho modal
+            const modal = document.createElement('div');
+            modal.className = 'confirmation-modal';
+            
+            const modalContent = `
+                <div class="modal-content">
+                    <div class="modal-header">
+                        <h4>Xác nhận nạp tiền</h4>
+                    </div>
+                    <div class="modal-body">
+                        <p>Bạn có chắc chắn muốn nạp <span class="amount">${amount}</span> VND?</p>
+                        <p>Nội dung: <span>${description || '(Không có)'}</span></p>
+                    </div>
+                    <div class="modal-actions">
+                        <button class="btn-cancel" id="cancelDeposit">Hủy bỏ</button>
+                        <button class="btn-confirm" id="confirmDeposit">Xác nhận</button>
+                    </div>
+                </div>
+            `;
+            
+            modal.innerHTML = modalContent;
+            document.body.appendChild(modal);
+            
+            // Thêm event listener cho nút hủy
+            modal.querySelector('#cancelDeposit').addEventListener('click', function() {
+                document.body.removeChild(modal);
+            });
+            
+            // Thêm event listener cho nút xác nhận
+            modal.querySelector('#confirmDeposit').addEventListener('click', function() {
+                depositForm.submit();
+            });
+        }
+        // ======= hàm xem chi tiết nạp tiền
+        const detailButtons = document.querySelectorAll('.btn-detail');
+        const transactionDetailModal = document.getElementById('transaction-detail-modal');
+    
+        // Xử lý nút chi tiết
+        detailButtons.forEach(function(button) {
+            button.addEventListener('click', function() {
+                // console.log('alsdfhdsfsdf');
+                const transactionId = this.getAttribute('data-id');
+                // Gọi API để lấy chi tiết giao dịch
+                fetchTransactionDetail(transactionId);
+                transactionDetailModal.style.display = 'block';
+            });
+        });
+        // Đóng modal khi click bên ngoài
+        window.addEventListener('click', function(event) {
+            if (event.target == addBankModal) {
+                addBankModal.style.display = 'none';
+            }
+            if (event.target == transactionDetailModal) {
+                transactionDetailModal.style.display = 'none';
+            }
+        });
+        // Hàm lấy năm, tháng, ngày, giờ, phút, giây
+        function formatISODate(isoString) {
+            const date = new Date(isoString);
+    
+            const year = date.getFullYear();
+            const month = String(date.getMonth() + 1).padStart(2, '0'); // Tháng từ 0-11, cần +1
+            const day = String(date.getDate()).padStart(2, '0');
+            const hours = String(date.getHours()).padStart(2, '0');
+            const minutes = String(date.getMinutes()).padStart(2, '0');
+            const seconds = String(date.getSeconds()).padStart(2, '0');
+    
+            return `${year}-${month}-${day} ${hours}:${minutes}:${seconds}`;
+        }
+    });
+
+
+</script>
+
+{% endblock %}

@@ -1,0 +1,145 @@
+{% extends "userLogin/base_sidebar.html" %}
+
+{% load static %}
+
+{% block title %}Dashboard - SmartTrade{% endblock %}
+
+{% block css %}
+<link rel="stylesheet" href="{% static 'userLogin/css/dashboard.css' %}">
+{% endblock %}
+
+{% block main-content %}
+<main class="dashboard-content">
+    <div class="dashboard-header">
+        <h2>Bảng điều khiển</h2>
+        <div class="date-filter">
+            <span>Thời gian:</span>
+            <select>
+                <option>Hôm nay</option>
+                <option>Tuần này</option>
+                <option>Tháng này</option>
+                <option>Năm nay</option>
+            </select>
+        </div>
+    </div>
+
+    <!-- Thẻ thống kê -->
+    <div class="stats-cards">
+        <div class="stat-card">
+            <div class="stat-icon">💰</div>
+            <div class="stat-info">
+                <h3>Tổng tài sản</h3>
+                <p class="stat-value">250,000,000 VND</p>
+                <p class="stat-change increase">+5.2% <span>từ tháng trước</span></p>
+            </div>
+        </div>
+        <div class="stat-card">
+            <div class="stat-icon">📈</div>
+            <div class="stat-info">
+                <h3>Lợi nhuận</h3>
+                <p class="stat-value">15,500,000 VND</p>
+                <p class="stat-change increase">+8.7% <span>từ tháng trước</span></p>
+            </div>
+        </div>
+        <div class="stat-card">
+            <div class="stat-icon">🔄</div>
+            <div class="stat-info">
+                <h3>Giao dịch</h3>
+                <p class="stat-value">124</p>
+                <p class="stat-change decrease">-2.3% <span>từ tháng trước</span></p>
+            </div>
+        </div>
+        <div class="stat-card">
+            <div class="stat-icon">⚖️</div>
+            <div class="stat-info">
+                <h3>Tỷ lệ thắng</h3>
+                <p class="stat-value">68.5%</p>
+                <p class="stat-change increase">+3.1% <span>từ tháng trước</span></p>
+            </div>
+        </div>
+    </div>
+
+    <!-- Biểu đồ -->
+    <div class="chart-container">
+        <div class="chart-card">
+            <div class="chart-header">
+                <h2>Biểu đồ lợi nhuận</h2>
+                <div class="chart-actions">
+                    <button class="btn-chart active">Ngày</button>
+                    <button class="btn-chart">Tuần</button>
+                    <button class="btn-chart">Tháng</button>
+                </div>
+            </div>
+            <div class="chart-body">
+                <!-- Đây là nơi bạn sẽ thêm biểu đồ (dùng canvas hoặc thư viện biểu đồ) -->
+                <div class="chart-placeholder">
+                    <div class="chart-line"></div>
+                    <div class="chart-line"></div>
+                    <div class="chart-line"></div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Bảng giao dịch gần đây -->
+    <div class="recent-transactions">
+        <div class="section-header">
+            <h2>Giao dịch gần đây</h2>
+            <a href="#" class="view-all">Xem tất cả</a>
+        </div>
+        <div class="table-container">
+            <table>
+                <thead>
+                    <tr>
+                        <th>Mã giao dịch</th>
+                        <th>Sản phẩm</th>
+                        <th>Ngày</th>
+                        <th>Loại</th>
+                        <th>Giá</th>
+                        <th>Số lượng</th>
+                        <th>Trạng thái</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td>#TR-12345</td>
+                        <td>Bitcoin</td>
+                        <td>12/03/2025</td>
+                        <td class="type-buy">Mua</td>
+                        <td>650,000,000 VND</td>
+                        <td>0.025 BTC</td>
+                        <td class="status-completed">Hoàn thành</td>
+                    </tr>
+                    <tr>
+                        <td>#TR-12344</td>
+                        <td>Ethereum</td>
+                        <td>11/03/2025</td>
+                        <td class="type-sell">Bán</td>
+                        <td>45,000,000 VND</td>
+                        <td>0.5 ETH</td>
+                        <td class="status-completed">Hoàn thành</td>
+                    </tr>
+                    <tr>
+                        <td>#TR-12343</td>
+                        <td>Cardano</td>
+                        <td>10/03/2025</td>
+                        <td class="type-buy">Mua</td>
+                        <td>5,000,000 VND</td>
+                        <td>1000 ADA</td>
+                        <td class="status-pending">Đang xử lý</td>
+                    </tr>
+                    <tr>
+                        <td>#TR-12342</td>
+                        <td>Solana</td>
+                        <td>09/03/2025</td>
+                        <td class="type-sell">Bán</td>
+                        <td>12,000,000 VND</td>
+                        <td>50 SOL</td>
+                        <td class="status-completed">Hoàn thành</td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+    </div>
+</main>
+{% endblock %}

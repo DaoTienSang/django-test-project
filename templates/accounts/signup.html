@@ -1,0 +1,83 @@
+{% extends 'base.html' %}
+{% load static %}
+
+
+{% block title %}SIGN UP{% endblock %}
+{% block css %}
+<link rel="stylesheet" href="{% static '/accounts/css/signup.css' %}">
+{% endblock %}
+
+
+
+{% block body %}
+<div id="body">
+    <div class="register-container">
+        <div class="logo-signup">
+            <h2>Smart<span>Trade</span></h2>
+        </div>
+        
+        {% for message in messages %}
+        <p><i>{{message}}</i></p>
+        {% endfor %}
+
+        <form method="post">
+            {% csrf_token %}
+            <div class="section-title"><p>Thông tin cá nhân</p></div>
+            
+            <div class="row">
+                <div class="col-6">
+                    <div class="form-group">
+                        <label for="firstname">Họ</label>
+                        <input name="firstname" type="text" class="form-control" id="firstname" placeholder="Nhập họ của bạn" required>
+                    </div>
+                </div>
+                
+                <div class="col-6">
+                    <div class="form-group">
+                        <label for="lastname">Tên</label>
+                        <input name="lastname" type="text" class="form-control" id="lastname" placeholder="Nhập tên của bạn" required>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="form-group">
+                <label for="email">Địa chỉ Email</label>
+                <input name="email" type="email" class="form-control" id="email" placeholder="Nhập địa chỉ email" required>
+            </div>
+            
+            <div class="section-title">Thông tin đăng nhập</div>
+            
+            <div class="form-group">
+                <label for="username">Tên đăng nhập</label>
+                <input name="username" type="text" class="form-control" id="username" placeholder="Tạo tên đăng nhập" required>
+            </div>
+            
+            <div class="row">
+                <div class="col-6">
+                    <div class="form-group">
+                        <label for="password">Mật khẩu</label>
+                        <input name="password" type="password" class="form-control" id="password" placeholder="Tạo mật khẩu" required>
+                    </div>
+                </div>
+                <div class="col-6">
+                    <div class="form-group">
+                        <label for="confirm-password">Xác nhận mật khẩu</label>
+                        <input name="confirmpassword" type="password" class="form-control" id="confirm-password" placeholder="Nhập lại mật khẩu" required>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="checkbox-wrapper">
+                <input type="checkbox" id="terms" required>
+                <label for="terms">Tôi đã đọc và đồng ý với <a href="#" style="color: #0058ff;">Điều khoản sử dụng</a> và <a href="#" style="color: #0058ff;">Chính sách bảo mật</a></label>
+            </div>
+            
+            <button type="submit" class="btn">ĐĂNG KÝ</button>
+            
+            <div class="login-link">
+                Bạn đã có tài khoản? <a href="{% url 'accounts:signin' %}">Đăng nhập ngay</a>
+            </div>
+        </form>
+    </div>
+</div>
+{% endblock %}

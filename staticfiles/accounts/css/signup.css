@@ -1,0 +1,134 @@
+#body {
+    background-color: #f5f7fa;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    min-height: 100vh;
+    padding: 20px;
+}
+
+.register-container {
+    width: 100%;
+    max-width: 500px;
+    background-color: #ffffff;
+    border-radius: 10px;
+    box-shadow: 0 0 15px rgba(0, 0, 0, 0.1);
+    padding: 30px;
+}
+
+.logo-signup {
+    text-align: center;
+    margin-bottom: 25px;
+}
+
+.logo-signup h2 {
+    color: #333;
+    font-size: 28px;
+    margin-top: 10px;
+}
+
+.logo-signup span {
+    color: #12b886;
+}
+
+.form-group {
+    margin-bottom: 20px;
+}
+
+.form-group label {
+    display: block;
+    font-size: 14px;
+    color: #666;
+    margin-bottom: 8px;
+}
+
+.form-control {
+    width: 100%;
+    height: 45px;
+    border: 1px solid #e0e0e0;
+    border-radius: 5px;
+    padding: 0 15px;
+    font-size: 14px;
+    transition: all 0.3s;
+}
+
+.form-control:focus {
+    border-color: #0058ff;
+    box-shadow: 0 0 0 2px rgba(0, 88, 255, 0.2);
+    outline: none;
+}
+
+.btn {
+    width: 100%;
+    height: 45px;
+    background-color: #0058ff;
+    color: white;
+    border: none;
+    border-radius: 5px;
+    font-size: 16px;
+    font-weight: bold;
+    cursor: pointer;
+    transition: background-color 0.3s;
+}
+
+.btn:hover {
+    background-color: #0046cc;
+}
+
+.login-link {
+    text-align: center;
+    margin-top: 20px;
+    color: #666;
+    font-size: 14px;
+}
+
+.login-link a {
+    color: #0058ff;
+    text-decoration: none;
+}
+
+.login-link a:hover {
+    text-decoration: underline;
+}
+
+.checkbox-wrapper {
+    display: flex;
+    align-items: flex-start;
+    margin-bottom: 20px;
+}
+
+.checkbox-wrapper input {
+    margin-right: 10px;
+    margin-top: 3px;
+}
+
+.checkbox-wrapper label {
+    font-size: 14px;
+    color: #666;
+    line-height: 1.4;
+}
+
+.section-title {
+    font-size: 18px;
+    color: #333;
+    margin-bottom: 15px;
+    padding-bottom: 10px;
+    border-bottom: 1px solid #eee;
+}
+
+.row {
+    display: flex;
+    flex-wrap: wrap;
+    margin: 0 -10px;
+}
+
+.col-6 {
+    width: 50%;
+    padding: 0 10px;
+}
+
+@media (max-width: 767px) {
+    .col-6 {
+        width: 100%;
+    }
+}

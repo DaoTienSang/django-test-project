@@ -1,0 +1,48 @@
+{% load static %}
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>{% block title %}{% endblock %}</title>
+    <link rel="stylesheet" href="{% static 'reset.css' %}">
+    <link rel="stylesheet" href="{% static 'base.css' %}">
+    {% block css %}{% endblock %}
+</head>
+<body>
+    {% for message in messages %}
+        <div class="notification" id="notification-{{ loop.index }}">
+            <p><i>{{ message }}</i></p>
+        </div>
+    {% endfor %}
+
+    <header>
+        <div class="container header-container">
+            <div class="logo"><a href="{% url 'news:home' %}">Smart<span>Trade</span></a></div>
+            <nav>
+                <ul>
+                    <!-- <li><a href="{% url 'news:home' %}">Trang chủ</a></li> -->
+                    <!-- <li><a href="#features">Tính năng</a></li>
+                    <li><a href="#trading">Giao dịch</a></li>
+                    <li><a href="#testimonials">Lời chứng thực</a></li>
+                    <li><a href="#pricing">Giá cả</a></li> -->
+                </ul>
+            </nav>
+            <div class="auth-buttons">
+                
+                {% if user.is_authentication %}
+                <p>Hello, <i>user.username</i></p>
+                <a href="#">Dăng xuất</a>
+                {% else %}
+                <a href="{% url 'accounts:signin' %}" class="login-btn">Đăng nhập</a>
+                <a href="{% url 'accounts:signup' %}" class="signup-btn">Đăng ký</a>
+                {% endif %}
+
+            </div>
+        </div>
+    </header>
+    
+    {% block body %}{% endblock %}
+</body>
+</html>

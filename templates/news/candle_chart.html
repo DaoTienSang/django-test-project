@@ -1,0 +1,25 @@
+{% load static %}
+
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <meta charset="UTF-8">
+    <title>Candlestick Chart</title>
+    <script src="https://unpkg.com/lightweight-charts@3.8.0/dist/lightweight-charts.standalone.production.js"></script>
+    <!-- <script src="https://unpkg.com/lightweight-charts/dist/lightweight-charts.standalone.production.js"></script> -->
+</head>
+<body>
+    <!-- <h1>Biểu đồ Nến Thời Gian Thực</h1> -->
+    <form action="" method="get" id="form-search-stock-code">
+        {% csrf_token %}
+        <label for="stock-code">Mã: </label>
+        <input type="text" name="stock-code" id="stock-code" value="ABC">
+        <button type="submit">Tìm kiếm</button>
+    </form>
+    {% for message in messages %}
+    <p><i>{{message}}</i></p>
+    {% endfor %}
+    <div id="chart-container"></div>
+    <script src="{% static 'news/js/candle_chart.js' %}"></script>
+</body>
+</html>

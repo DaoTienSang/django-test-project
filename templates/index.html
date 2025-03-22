@@ -1,0 +1,171 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}HOME{% endblock %}
+{% block css %}
+<link rel="stylesheet" href="{% static 'news/css/index.css' %}">
+{% endblock %}
+
+
+{% block body %}
+<!-- Hero Section -->
+<section class="hero" id="home">
+    <div class="container hero-content">
+        <div class="hero-text">
+            <h1>Hệ thống giao dịch thị trường chứng khoán tiên tiến</h1>
+            <p>Tăng cường khả năng giao dịch của bạn với phân tích thời gian thực, biểu đồ nâng cao và các thuật toán thông minh. SmartTrade được thiết kế cho mọi cấp độ nhà giao dịch để tối đa hóa lợi nhuận và giảm thiểu rủi ro.</p>
+            <!-- <button class="hero-cta">Bắt đầu giao dịch ngay</button> -->
+        </div>
+        <div class="hero-image">
+            <img src="{% static 'IMG/desktop_blue.png' %}" alt="Giao diện giao dịch">
+        </div>
+    </div>
+</section>
+
+<!-- Features Section -->
+<section class="features" id="features">
+    <div class="container">
+        <div class="section-title">
+            <h2>Tính năng giao dịch mạnh mẽ</h2>
+            <p>SmartTrade được trang bị mọi thứ bạn cần để thành công trong thị trường biến động ngày nay</p>
+        </div>
+        <div class="features-grid">
+            <div class="feature-card">
+                <div class="feature-icon">📊</div>
+                <h3>Phân tích thời gian thực</h3>
+                <p>Truy cập dữ liệu và phân tích thị trường thời gian thực để đưa ra quyết định giao dịch sáng suốt. Hệ thống của chúng tôi xử lý dữ liệu thị trường với độ trễ tối thiểu.</p>
+            </div>
+            <div class="feature-card">
+                <div class="feature-icon">📈</div>
+                <h3>Biểu đồ nâng cao</h3>
+                <p>Sử dụng hơn 100 chỉ báo kỹ thuật và công cụ vẽ để phân tích xu hướng và mô hình thị trường một cách chính xác.</p>
+            </div>
+            <div class="feature-card">
+                <div class="feature-icon">🤖</div>
+                <h3>Giao dịch tự động</h3>
+                <p>Thiết lập các thuật toán giao dịch tùy chỉnh và để hệ thống của chúng tôi tự động thực hiện giao dịch dựa trên tiêu chí bạn đặt trước.</p>
+            </div>
+            <div class="feature-card">
+                <div class="feature-icon">🔔</div>
+                <h3>Cảnh báo tùy chỉnh</h3>
+                <p>Tạo cảnh báo cá nhân hóa cho biến động giá, tín hiệu chỉ báo kỹ thuật và các sự kiện thị trường quan trọng.</p>
+            </div>
+            <div class="feature-card">
+                <div class="feature-icon">📱</div>
+                <h3>Giao dịch trên di động</h3>
+                <p>Giao dịch mọi lúc, mọi nơi với nền tảng di động phản hồi nhanh, cho phép bạn truy cập đầy đủ các tính năng từ bất kỳ đâu.</p>
+            </div>
+            <div class="feature-card">
+                <div class="feature-icon">🛡️</div>
+                <h3>Quản lý rủi ro</h3>
+                <p>Bảo vệ khoản đầu tư của bạn với các công cụ quản lý rủi ro tiên tiến bao gồm dừng lỗ, chốt lời và đa dạng hóa danh mục đầu tư.</p>
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- Stats Section -->
+<section class="stats">
+    <div class="container">
+        <div class="stats-grid">
+            <div class="stat-item">
+                <h3>10K+</h3>
+                <p>Nhà giao dịch hoạt động</p>
+            </div>
+            <div class="stat-item">
+                <h3>$500M+</h3>
+                <p>Khối lượng giao dịch hàng tháng</p>
+            </div>
+            <div class="stat-item">
+                <h3>50+</h3>
+                <p>Thị trường toàn cầu</p>
+            </div>
+            <div class="stat-item">
+                <h3>99.9%</h3>
+                <p>Độ tin cậy hoạt động</p>
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- Trading View Section -->
+<section class="trading-view" id="trading">
+    <div class="container trading-view-content">
+        <div class="trading-view-text">
+            <h2>Giao diện giao dịch chuyên nghiệp</h2>
+            <p>Giao diện giao dịch trực quan nhưng mạnh mẽ của chúng tôi cung cấp mọi thứ bạn cần cho hoạt động giao dịch thành công trong một nơi duy nhất.</p>
+            <ul>
+                <li>Bố cục đa biểu đồ với khung thời gian đồng bộ</li>
+                <li>Thực hiện giao dịch một cú nhấp chuột để vào thị trường nhanh chóng</li>
+                <li>Không gian làm việc tùy chỉnh phù hợp với phong cách giao dịch của bạn</li>
+                <li>Hiển thị sổ lệnh thời gian thực và độ sâu thị trường</li>
+                <li>Theo dõi danh mục đầu tư nâng cao và phân tích hiệu suất</li>
+            </ul>
+            <!-- <button class="hero-cta">Khám phá giao diện</button> -->
+        </div>
+        <div class="trading-view-image">
+            <img src="{% static 'IMG/desktop_en_dark.png' %}" alt="Bảng điều khiển giao dịch">
+        </div>
+    </div>
+</section>
+
+<!-- CTA Section -->
+<section class="cta" id="pricing">
+    <div class="container">
+        <h2>Bắt đầu giao dịch tự tin ngay hôm nay</h2>
+        <p>Chọn từ các gói linh hoạt của chúng tôi được thiết kế để đáp ứng nhu cầu của cả nhà giao dịch mới bắt đầu và chuyên nghiệp.</p>
+        <div class="cta-buttons">
+            <!-- <button class="cta-primary">Xem các gói giá</button>
+            <button class="cta-secondary">Lên lịch demo</button> -->
+        </div>
+    </div>
+</section>
+
+<!-- Footer -->
+<footer>
+    <div class="container">
+        <div class="footer-grid">
+            <div class="footer-about">
+                <h3>SmartTrade</h3>
+                <p>Hệ thống giao dịch thị trường chứng khoán tiên tiến được xây dựng cho những nhà giao dịch đòi hỏi sự xuất sắc. Sứ mệnh của chúng tôi là trao quyền cho nhà giao dịch với các công cụ tiên tiến để tham gia thị trường thành công.</p>
+                <div class="social-links">
+                    <a href="#">FB</a>
+                    <a href="#">TW</a>
+                    <a href="#">IG</a>
+                    <a href="#">LI</a>
+                </div>
+            </div>
+            <div class="footer-links">
+                <h4>Công ty</h4>
+                <ul>
+                    <li><a href="#">Về chúng tôi</a></li>
+                    <li><a href="#">Đội ngũ của chúng tôi</a></li>
+                    <li><a href="#">Tuyển dụng</a></li>
+                    <li><a href="#">Báo chí</a></li>
+                </ul>
+            </div>
+            <div class="footer-links">
+                <h4>Tài nguyên</h4>
+                <ul>
+                    <li><a href="#">Blog</a></li>
+                    <li><a href="#">Hướng dẫn</a></li>
+                    <li><a href="#">Tài liệu API</a></li>
+                    <li><a href="#">Kiến thức cơ bản</a></li>
+                </ul>
+            </div>
+            <div class="footer-links">
+                <h4>Hỗ trợ</h4>
+                <ul>
+                    <li><a href="#">Trung tâm trợ giúp</a></li>
+                    <li><a href="#">Liên hệ với chúng tôi</a></li>
+                    <li><a href="#">Điều khoản dịch vụ</a></li>
+                    <li><a href="#">Chính sách bảo mật</a></li>
+                </ul>
+            </div>
+        </div>
+        <div class="footer-bottom">
+            <p>© 2025 SmartTrade. Mọi quyền được bảo lưu.</p>
+        </div>
+    </div>
+</footer>
+{% endblock %}
