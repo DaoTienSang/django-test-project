@@ -95,20 +95,20 @@
                 </thead>
                 <tbody>
 
-                    {% for transaction in history_deposit %}
+                    {% for h in history_deposit %}
                     <tr>
-                        <td>#POS-{{transaction.id}}</td>
-                        <td>{{transaction.time}}</td>
-                        <td>+ {{transaction.amount|intcomma}} VND</td>
-                        <td>{{transaction.description}}</td>
-                        <td class="status {%if transaction.status == 'P' %}
+                        <td>{{h.id}}</td>
+                        <td>{{h.time}}</td>
+                        <td>{{h.amount|intcomma}} VND</td>
+                        <td>{{h.description}}</td>
+                        <td class="status {%if h.status == 'P' %}
                                         status-processing
-                                        {% elif transaction.status == 'C' %}
+                                        {% elif h.status == 'C' %}
                                         status-completed
                                         {% else %}
                                         status-cancalled
-                                        {% endif %}"><p>{{transaction.get_status_display}}</p></td>
-                        <td><button class="btn-detail" data-id="{{ transaction.id }}">Chi tiết</button></td>
+                                        {% endif %}"><p>{{h.get_status_display}}</p></td>
+                        <td><button class="btn-detail">Chi tiết</button></td>
                     </tr>
                     {% empty %}
                     <tr>
@@ -168,23 +168,24 @@
 </main>
 
 
+<!-- Tạo nút xác nhập nộp -->
 <script>
     document.addEventListener('DOMContentLoaded', function() {
-        // - Format số tiền khi nhập
-        const withdrawAmountInput = document.getElementById('withdraw-amount');
+        // Hàm xử lý nạp tiền
+        const withdrawAmountInput = document.getElementById('deposit-amount');
         if (withdrawAmountInput) {
             withdrawAmountInput.addEventListener('input', function(e) {
                 // Xóa tất cả ký tự không phải số
                 let value = this.value.replace(/\D/g, '');
                 // Format với dấu phẩy ngăn cách hàng nghìn
                 if (value) {
-                    this.value = value.replace(/\B(?=(\d{3})+(?!\d))/g, ",");
+                    this.value = parseInt(value).toLocaleString('vi-VN');
                 } else {
                     this.value = '';
                 }
             });
         }
-        // - Thêm tài khoản ngân hàng
+        
         const addBankLink = document.querySelector('.add-bank-link');
         const addBankModal = document.getElementById('add-bank-modal');
         const closeButtons = document.querySelectorAll('.close');
@@ -203,8 +204,8 @@
             });
         });
 
-        
         const depositForm = document.querySelector('.deposit-form');
+        
         // Ngăn chặn submit mặc định và hiển thị modal
         depositForm.addEventListener('submit', function(e) {
             e.preventDefault();
@@ -272,15 +273,14 @@
                 depositForm.submit();
             });
         }
-
-
-        // - Chi tiết nạp tiền
+        // ======= hàm xem chi tiết nạp tiền
         const detailButtons = document.querySelectorAll('.btn-detail');
         const transactionDetailModal = document.getElementById('transaction-detail-modal');
+    
         // Xử lý nút chi tiết
         detailButtons.forEach(function(button) {
             button.addEventListener('click', function() {
-                // console.log('alsdfhdsfsdf');
+                console.log('alsdfhdsfsdf');
                 const transactionId = this.getAttribute('data-id');
                 // Gọi API để lấy chi tiết giao dịch
                 fetchTransactionDetail(transactionId);
@@ -308,56 +308,6 @@
             const seconds = String(date.getSeconds()).padStart(2, '0');
     
             return `${year}-${month}-${day} ${hours}:${minutes}:${seconds}`;
-        }
-        // Hàm lấy chi tiết giao dịch
-        function fetchTransactionDetail(id) {
-            // Lấy chi tiết từ api
-            fetch(`/api/transaction/${id}/`)
-                .then(response => response.json())
-                .then(data => {
-                    const contentDiv = document.getElementById('transaction-detail-content');
-                    contentDiv.innerHTML = `
-                        <div class="detail-item">
-                            <span class="label">Mã giao dịch:</span>
-                            <span class="value">#POS-${data.id}</span>
-                        </div>
-                        <div class="detail-item">
-                            <span class="label">Ngày giao dịch:</span>
-                            <span class="value">${formatISODate(data.time)}</span>
-                        </div>
-                        <div class="detail-item">
-                            <span class="label">Số tiền:</span>
-                            <span class="value">+ ${data.amount.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ",")} VND</span>
-                        </div>
-                        <div class="detail-item">
-                            <span class="label">Số tiền còn lại:</span>
-                            <span class="value">${data.balance_after.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ",")} VND</span>
-                        </div>
-                        <div class="detail-item">
-                            <span class="label">Ngân hàng:</span>
-                            <span class="value">${data.bank_info.bank_name}</span>
-                        </div>
-                        <div class="detail-item">
-                            <span class="label">Số tài khoản:</span>
-                            <span class="value">${data.bank_info.account_number}</span>
-                        </div>
-                        <div class="detail-item">
-                            <span class="label">Tên chủ tài khoản:</span>
-                            <span class="value">${data.bank_info.account_name}</span>
-                        </div>
-                        <div class="detail-item">
-                            <span class="label">Trạng thái:</span>
-                            <span class="value status-${data.status.toLowerCase()}">${data.status_display}</span>
-                        </div>
-                        <div class="detail-item">
-                            <span class="label">Ghi chú:</span>
-                            <span class="value">${data.description || 'Không có'}</span>
-                        </div>
-                    `;
-                })
-                .catch(error => {
-                    console.error('Error fetching transaction details:', error);
-                });
         }
     });
 

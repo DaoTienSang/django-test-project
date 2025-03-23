@@ -13,9 +13,12 @@ urlpatterns = [
     path("deposit/", views.deposit_management, name='deposit'),
     path('withdraw/', views.withdraw_management, name='withdraw'),
     path('trading/', views.trading_management, name='trading'),
-    path('add-bank-account/', views.add_bank_account, name='add_bank_account'),
 
-    # API lấy chi tiết lịch sử giao dịch
-    path('api/transaction/<int:id>/', api_services.transaction_detail, name='transaction-detail'),
-    path('api/stock-price/<str:stock_code>/', api_services.stock_price_api, name='stock_price_api'),
+    path('add-bank-account/', views.add_bank_account, name='add_bank_account'),     # add bank account
+    path('buy-stock/', views.buy_stock, name='buy_stock'),                          # buy stock
+    path('sell-stock/', views.sell_stock, name='sell_stock'),                          # buy stock
+
+    # API
+    path('api/transaction/<int:id>/', api_services.transaction_detail, name='transaction-detail'),      # Chi tiết giao dịch
+    path('api/stock-price/<str:stock_code>/', api_services.stock_price_api, name='stock_price_api'),    # Giá khớp lệnh cổ phiếu
 ]

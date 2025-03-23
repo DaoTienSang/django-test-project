@@ -24,13 +24,13 @@
                 <p class="info-amount">{{ user.balance|intcomma}} VND</p>
             </div>
         </div>
-        <div class="info-card">
+        <!-- <div class="info-card">
             <div class="info-icon">📈</div>
             <div class="info-details">
                 <h3>Giá trị danh mục</h3>
                 <p class="info-amount">{{ portfolio_value|intcomma }} VND</p>
             </div>
-        </div>
+        </div> -->
         <div class="info-card">
             <div class="info-icon">🔄</div>
             <div class="info-details">
@@ -50,7 +50,7 @@
         <!-- Tab nội dung Mua -->
         <div class="tab-content active" id="buy-tab">
             <div class="trading-form-container">
-                <form class="trading-form" method="post" action="">
+                <form class="trading-form" id="buy-stock-form" method="post" action="{% url 'userLogin:buy_stock' %}">
                     <!-- 'userLogin:buy_stock' -->
                     {% csrf_token %}
                     <div class="form-group">
@@ -58,14 +58,14 @@
                         <select name="stock-code" id="buy-stock-code" required>
                             <option value="">Chọn mã cổ phiếu</option>
                             {% for stock in list_stock_market %}
-                            <option value="{{ stock.stock_code }}">{{ stock.ticker }} - {{ stock.organ_name }}</option>
+                            <option value="{{stock.ticker}}">{{ stock.ticker }} - {{ stock.organ_name }}</option>
                             {% endfor %}
                         </select>
                     </div>
                     
                     <div class="form-group">
                         <label for="buy-stock-price">Giá hiện tại (VND)</label>
-                        <input type="text" id="buy-stock-price" readonly>
+                        <input type="text" name="stock-price" id="buy-stock-price">
                     </div>
                     
                     <div class="form-group">
@@ -79,16 +79,34 @@
                     </div>
                     
                     <div class="form-actions">
-                        <button type="submit" class="btn-submit">Xác nhận mua</button>
+                        <button type="submit" class="btn-submit">Mua</button>
                     </div>
                 </form>
+            </div>
+        </div>
+        <!-- Modal xác nhận mua cổ phiếu -->
+        <div id="confirmation-modal" class="modal">
+            <div class="modal-content">
+            <span class="close-modal">&times;</span>
+            <h2>Xác nhận giao dịch</h2>
+            <p>Bạn có chắc chắn muốn thực hiện giao dịch sau?</p>
+            <div class="confirmation-details">
+                <p><strong>Mã cổ phiếu:</strong> <span id="confirm-stock-code"></span></p>
+                <p><strong>Giá:</strong> <span id="confirm-stock-price"></span> VND</p>
+                <p><strong>Số lượng:</strong> <span id="confirm-stock-amount"></span></p>
+                <p><strong>Tổng giá trị:</strong> <span id="confirm-total-value"></span> VND</p>
+            </div>
+            <div class="modal-actions">
+                <button id="cancel-transaction" class="btn-cancel">Hủy</button>
+                <button id="confirm-transaction" class="btn-confirm">Xác nhận</button>
+            </div>
             </div>
         </div>
         
         <!-- Tab nội dung Bán -->
         <div class="tab-content" id="sell-tab">
             <div class="trading-form-container">
-                <form class="trading-form" method="post" action="">
+                <form class="trading-form" method="post" action="{% url 'userLogin:sell_stock' %}">
                     {% csrf_token %}
                     <div class="form-group">
                         <label for="sell-stock-code">Cổ phiếu đang sở hữu</label>
@@ -102,7 +120,7 @@
                     
                     <div class="form-group">
                         <label for="sell-stock-price">Giá hiện tại (VND)</label>
-                        <input type="text" id="sell-stock-price" readonly>
+                        <input type="text" name="stock-price" id="sell-stock-price">
                     </div>
                     
                     <div class="form-group">
@@ -120,6 +138,24 @@
                         <button type="submit" class="btn-submit">Xác nhận bán</button>
                     </div>
                 </form>
+            </div>
+        </div>
+        <!-- Modal xác nhận bán cổ phiếu -->
+        <div id="sell-confirmation-modal" class="modal">
+            <div class="modal-content">
+                <span class="close-modal">&times;</span>
+                <h2>Xác nhận giao dịch bán</h2>
+                <p>Bạn có chắc chắn muốn thực hiện giao dịch bán sau?</p>
+                <div class="confirmation-details">
+                    <p><strong>Mã cổ phiếu:</strong> <span id="sell-confirm-stock-code"></span></p>
+                    <p><strong>Giá:</strong> <span id="sell-confirm-stock-price"></span> VND</p>
+                    <p><strong>Số lượng:</strong> <span id="sell-confirm-stock-amount"></span></p>
+                    <p><strong>Tổng giá trị:</strong> <span id="sell-confirm-total-value"></span> VND</p>
+                </div>
+                <div class="modal-actions">
+                    <button id="sell-cancel-transaction" class="btn-cancel">Hủy</button>
+                    <button id="sell-confirm-transaction" class="btn-confirm">Xác nhận</button>
+                </div>
             </div>
         </div>
     </div>
@@ -154,10 +190,9 @@
                     <tr class="transaction-row ">
                         <td>#{{ transaction.id }}</td>
                         <td>{{ transaction.time|date:"d/m/Y H:i" }}</td>
-                        <td>{{ transaction.stock.stock_code }}</td>
+                        <td>{{ transaction.stock_code }}</td>
                         <td class="transaction-type ">
-                            Bán
-                            {# {{ "Bán" if transaction.is_sell else "Mua" }} #}
+                            {% if transaction.is_sell %} <span>Bán</span> {% else %} <span>Mua</span> {% endif %}
                         </td>
                         <td>{{ transaction.amount }}</td>
                         <td>{{ transaction.price|intcomma }} VND</td>
@@ -173,193 +208,232 @@
         </div>
     </div>
 
-    <!-- Danh mục đầu tư -->
-    <div class="portfolio-section">
-        <div class="portfolio-header">
-            <h3>Danh mục đầu tư</h3>
-        </div>
-        <div class="table-container">
-            <table>
-                <thead>
-                    <tr>
-                        <th>Mã cổ phiếu</th>
-                        <th>Tên công ty</th>
-                        <th>Số lượng</th>
-                        <th>Giá hiện tại</th>
-                        <th>Giá trị hiện tại</th>
-                        <th>Lãi/Lỗ</th>
-                    </tr>
-                </thead>
-                <tbody>
-                    {% for item in portfolio %}
-                    <tr>
-                        <td>{{ item.stock.stock_code }}</td>
-                        <td>{{ item.stock.company_name }}</td>
-                        <td>{{ item.amount }}</td>
-                        <td>{{ item.current_price|intcomma }} VND</td>
-                        <td>{{ item.current_value|intcomma }} VND</td>
-                        loss
-                        {# <td class="{{ 'profit' if item.profit_loss > 0 else 'loss' if item.profit_loss < 0 else '' }}"> #}
-                            {{ item.profit_loss|intcomma }} VND
-                            {% if item.profit_loss > 0 %}
-                            <span class="trend-up">&#9650;</span>
-                            {% elif item.profit_loss < 0 %}
-                            <span class="trend-down">&#9660;</span>
-                            {% endif %}
-                        </td>
-                    </tr>
-                    {% empty %}
-                    <tr>
-                        <td colspan="6" class="no-data">Chưa có cổ phiếu nào trong danh mục</td>
-                    </tr>
-                    {% endfor %}
-                </tbody>
-            </table>
-        </div>
-    </div>
 </main>
 
 <script>
     document.addEventListener('DOMContentLoaded', function() {
-        // Xử lý tabs
-        const tabButtons = document.querySelectorAll('.tab-btn');
-        const tabContents = document.querySelectorAll('.tab-content');
-        
-        tabButtons.forEach(button => {
-            button.addEventListener('click', function() {
-                // Remove active class from all buttons
-                tabButtons.forEach(btn => btn.classList.remove('active'));
-                // Add active class to clicked button
-                this.classList.add('active');
-                
-                // Hide all tab contents
-                tabContents.forEach(content => content.classList.remove('active'));
-                // Show the selected tab content
-                const tabId = this.getAttribute('data-tab') + '-tab';
-                document.getElementById(tabId).classList.add('active');
-            });
+    // Xử lý tabs Mua/Bán
+    const tabButtons = document.querySelectorAll('.tab-btn');
+    const tabContents = document.querySelectorAll('.tab-content');
+    
+    tabButtons.forEach(button => {
+        button.addEventListener('click', function() {
+            // Remove active class from all buttons
+            tabButtons.forEach(btn => btn.classList.remove('active'));
+            // Add active class to clicked button
+            this.classList.add('active');
+            
+            // Hide all tab contents
+            tabContents.forEach(content => content.classList.remove('active'));
+            // Show the selected tab content
+            const tabId = this.getAttribute('data-tab') + '-tab';
+            document.getElementById(tabId).classList.add('active');
         });
-        
-        // Xử lý lọc lịch sử giao dịch
-        const transactionFilter = document.getElementById('transaction-type-filter');
-        if (transactionFilter) {
-            transactionFilter.addEventListener('change', function() {
-                const filterValue = this.value;
-                const rows = document.querySelectorAll('.transaction-row');
-                
-                rows.forEach(row => {
-                    if (filterValue === 'all') {
-                        row.style.display = '';
-                    } else if (filterValue === 'buy' && row.classList.contains('buy-row')) {
-                        row.style.display = '';
-                    } else if (filterValue === 'sell' && row.classList.contains('sell-row')) {
-                        row.style.display = '';
-                    } else {
-                        row.style.display = 'none';
-                    }
-                });
-            });
-        }
-        
-        // Giả lập API lấy giá cổ phiếu
-        const stockPrices = {
-            {% for stock in stocks %}
-            '{{ stock.stock_code }}': {{ stock.current_price|default:10000 }},
-            {% endfor %}
-        };
-        
-        // Xử lý chọn cổ phiếu và tính toán giá trị khi mua
-        const buyStockSelect = document.getElementById('buy-stock-code');
-        const buyStockPrice = document.getElementById('buy-stock-price');
-        const buyStockAmount = document.getElementById('buy-stock-amount');
-        const buyTotalValue = document.getElementById('buy-total-value');
-        
-        if (buyStockSelect) {
-            buyStockSelect.addEventListener('change', function() {
-                const selectedStock = this.value;
-                if (selectedStock && stockPrices[selectedStock]) {
-                    const price = stockPrices[selectedStock];
-                    buyStockPrice.value = price.toLocaleString('vi-VN') + ' VND';
-                    updateBuyTotal();
-                } else {
-                    buyStockPrice.value = '';
-                    buyTotalValue.textContent = '0 VND';
-                }
-            });
-        }
-        
-        if (buyStockAmount) {
-            buyStockAmount.addEventListener('input', updateBuyTotal);
-        }
-        
-        function updateBuyTotal() {
-            const selectedStock = buyStockSelect.value;
-            const amount = parseInt(buyStockAmount.value) || 0;
-            
-            if (selectedStock && stockPrices[selectedStock] && amount > 0) {
-                const price = stockPrices[selectedStock];
-                const total = price * amount;
-                buyTotalValue.textContent = total.toLocaleString('vi-VN') + ' VND';
-            } else {
-                buyTotalValue.textContent = '0 VND';
-            }
-        }
-        
-        // Xử lý chọn cổ phiếu và tính toán giá trị khi bán
-        const sellStockSelect = document.getElementById('sell-stock-code');
-        const sellStockPrice = document.getElementById('sell-stock-price');
-        const sellStockAmount = document.getElementById('sell-stock-amount');
-        const sellTotalValue = document.getElementById('sell-total-value');
-        const ownedAmount = document.getElementById('owned-amount');
-        
-        // Map lưu trữ số lượng cổ phiếu sở hữu của mỗi mã
-        const stockOwned = {
-            {% for stock in user_stocks %}
-            '{{ stock.stock.stock_code }}': {{ stock.amount }},
-            {% endfor %}
-        };
-        
-        if (sellStockSelect) {
-            sellStockSelect.addEventListener('change', function() {
-                const selectedStock = this.value;
-                if (selectedStock && stockPrices[selectedStock]) {
-                    const price = stockPrices[selectedStock];
-                    sellStockPrice.value = price.toLocaleString('vi-VN') + ' VND';
-                    ownedAmount.textContent = stockOwned[selectedStock] || 0;
-                    updateSellTotal();
-                } else {
-                    sellStockPrice.value = '';
-                    ownedAmount.textContent = '0';
-                    sellTotalValue.textContent = '0 VND';
-                }
-            });
-        }
-        
-        if (sellStockAmount) {
-            sellStockAmount.addEventListener('input', updateSellTotal);
-        }
-        
-        function updateSellTotal() {
-            const selectedStock = sellStockSelect.value;
-            const amount = parseInt(sellStockAmount.value) || 0;
-            
-            if (selectedStock && stockPrices[selectedStock] && amount > 0) {
-                const price = stockPrices[selectedStock];
-                const total = price * amount;
-                sellTotalValue.textContent = total.toLocaleString('vi-VN') + ' VND';
-                
-                // Kiểm tra số lượng có quá số lượng sở hữu không
-                const owned = stockOwned[selectedStock] || 0;
-                if (amount > owned) {
-                    sellStockAmount.setCustomValidity('Số lượng bán không được vượt quá số lượng sở hữu');
-                } else {
-                    sellStockAmount.setCustomValidity('');
-                }
-            } else {
-                sellTotalValue.textContent = '0 VND';
-            }
-        }
-        
     });
+
+    // ==== XỬ LÝ MUA CỔ PHIẾU ====
+    const buyStockCode = document.getElementById('buy-stock-code');
+    const buyStockPriceInput = document.getElementById('buy-stock-price');
+    const buyStockAmountInput = document.getElementById('buy-stock-amount');
+    const buyTotalValueElement = document.getElementById('buy-total-value');
+    const buyForm = document.getElementById('buy-stock-form');
+
+    const buyModal = document.getElementById('confirmation-modal');
+    const buyCloseModal = buyModal.querySelector('.close-modal');
+    const buyCancelBtn = document.getElementById('cancel-transaction');
+    const buyConfirmBtn = document.getElementById('confirm-transaction');
+
+    // Lấy giá cổ phiếu khi thay đổi mã
+    buyStockCode.addEventListener("change", function() {
+        const stockCode = buyStockCode.value;
+        if (stockCode){
+            fetchStockPrice(stockCode, buyStockPriceInput, buyStockAmountInput, buyTotalValueElement);
+        } else {
+            alert(`Không tìm thấy mã cổ phiếu`);
+        }
+    });
+    
+    // Cập nhật tổng giá trị khi thay đổi số lượng
+    buyStockAmountInput.addEventListener('input', function() {
+        updateTotalValue(buyStockPriceInput, buyStockAmountInput, buyTotalValueElement);
+    });
+    
+    // Hiển thị modal xác nhận khi submit form mua
+    buyForm.addEventListener('submit', function(e) {
+        e.preventDefault();
+        
+        const stockCode = buyStockCode.options[buyStockCode.selectedIndex].text;
+        const stockPrice = buyStockPriceInput.value;
+        const stockAmount = buyStockAmountInput.value;
+        const totalValue = buyTotalValueElement.textContent.replace(' VND', '');
+        
+        // Cập nhật thông tin vào modal
+        document.getElementById('confirm-stock-code').textContent = stockCode;
+        document.getElementById('confirm-stock-price').textContent = stockPrice;
+        document.getElementById('confirm-stock-amount').textContent = stockAmount;
+        document.getElementById('confirm-total-value').textContent = totalValue;
+        
+        // Hiển thị modal
+        buyModal.style.display = 'block';
+    });
+    
+    // Xử lý sự kiện modal mua
+    buyCloseModal.addEventListener('click', function() {
+        buyModal.style.display = 'none';
+    });
+    
+    buyCancelBtn.addEventListener('click', function() {
+        buyModal.style.display = 'none';
+    });
+    
+    buyConfirmBtn.addEventListener('click', function() {
+        // Tiến hành submit form
+        buyModal.style.display = 'none';
+        buyForm.submit();
+    });
+    
+    // ==== XỬ LÝ BÁN CỔ PHIẾU ====
+    const sellStockCode = document.getElementById('sell-stock-code');
+    const sellStockPriceInput = document.getElementById('sell-stock-price');
+    const sellStockAmountInput = document.getElementById('sell-stock-amount');
+    const sellTotalValueElement = document.getElementById('sell-total-value');
+    const ownedAmountElement = document.getElementById('owned-amount');
+    const sellForm = document.querySelector('#sell-tab .trading-form');
+
+    const sellModal = document.getElementById('sell-confirmation-modal');
+    const sellCloseModal = sellModal.querySelector('.close-modal');
+    const sellCancelBtn = document.getElementById('sell-cancel-transaction');
+    const sellConfirmBtn = document.getElementById('sell-confirm-transaction');
+    
+    // Xử lý khi chọn cổ phiếu để bán
+    sellStockCode.addEventListener('change', function() {
+        const stockCode = this.value;
+        if(stockCode) {
+            // Lấy số lượng đang sở hữu từ option text
+            const optionText = this.options[this.selectedIndex].text;
+            const ownedMatch = optionText.match(/Sở hữu: (\d+)/);
+            const ownedAmount = ownedMatch ? ownedMatch[1] : '0';
+            
+            // Cập nhật số lượng sở hữu hiển thị
+            ownedAmountElement.textContent = ownedAmount;
+            
+            // Giới hạn số lượng bán tối đa
+            sellStockAmountInput.setAttribute('max', ownedAmount);
+            
+            // Fetch giá hiện tại
+            fetchStockPrice(stockCode, sellStockPriceInput, sellStockAmountInput, sellTotalValueElement);
+        } else {
+            ownedAmountElement.textContent = '0';
+            sellStockPriceInput.value = '';
+            updateTotalValue(sellStockPriceInput, sellStockAmountInput, sellTotalValueElement);
+        }
+    });
+    
+    // Cập nhật tổng giá trị khi thay đổi số lượng bán
+    sellStockAmountInput.addEventListener('input', function() {
+        // Kiểm tra nếu số lượng vượt quá số lượng sở hữu
+        const maxAmount = parseInt(this.getAttribute('max') || 0);
+        const currentAmount = parseInt(this.value || 0);
+        
+        if(currentAmount > maxAmount) {
+            this.value = maxAmount;
+            alert('Số lượng bán không thể vượt quá số lượng đang sở hữu!');
+        }
+        
+        updateTotalValue(sellStockPriceInput, sellStockAmountInput, sellTotalValueElement);
+    });
+    
+    // Hiển thị modal xác nhận khi submit form bán
+    sellForm.addEventListener('submit', function(e) {
+        e.preventDefault();
+        
+        if(!sellStockCode.value) {
+            alert('Vui lòng chọn mã cổ phiếu để bán!');
+            return;
+        }
+        
+        if(!sellStockAmountInput.value || parseInt(sellStockAmountInput.value) <= 0) {
+            alert('Vui lòng nhập số lượng hợp lệ!');
+            return;
+        }
+        
+        const stockCode = sellStockCode.options[sellStockCode.selectedIndex].text.split(' - ')[0];
+        const stockPrice = sellStockPriceInput.value;
+        const stockAmount = sellStockAmountInput.value;
+        const totalValue = sellTotalValueElement.textContent.replace(' VND', '');
+        
+        // Cập nhật thông tin vào modal
+        document.getElementById('sell-confirm-stock-code').textContent = stockCode;
+        document.getElementById('sell-confirm-stock-price').textContent = stockPrice;
+        document.getElementById('sell-confirm-stock-amount').textContent = stockAmount;
+        document.getElementById('sell-confirm-total-value').textContent = totalValue;
+        
+        // Hiển thị modal
+        sellModal.style.display = 'block';
+    });
+    
+    // Xử lý sự kiện modal bán
+    sellCloseModal.addEventListener('click', function() {
+        sellModal.style.display = 'none';
+    });
+    
+    sellCancelBtn.addEventListener('click', function() {
+        sellModal.style.display = 'none';
+    });
+    
+    sellConfirmBtn.addEventListener('click', function() {
+        // Thêm action URL cho form bán
+        // sellForm.action = "{% url 'userLogin:sell_stock' %}";
+        
+        // Tiến hành submit form
+        sellModal.style.display = 'none';
+        sellForm.submit();
+    });
+    
+    // Đóng modal khi click bên ngoài
+    window.addEventListener('click', function(e) {
+        if (e.target == buyModal) {
+            buyModal.style.display = 'none';
+        }
+        if (e.target == sellModal) {
+            sellModal.style.display = 'none';
+        }
+    });
+    
+    // ==== COMMON FUNCTIONS ====
+    
+    // Hàm lấy giá cổ phiếu từ API
+    function fetchStockPrice(stockCode, priceInput, amountInput, totalElement) {
+        fetch(`/api/stock-price/${stockCode}/`)
+        .then(response => {
+            if (!response.ok) {
+                throw new Error('Network response was not ok');
+            }
+            return response.json();
+        })
+        .then(data => {
+            priceInput.value = formatPrice(data.match_price);
+            updateTotalValue(priceInput, amountInput, totalElement);
+        })
+        .catch(error => {
+            console.error('Error fetching stock price:', error);
+            priceInput.value = 'Không thể lấy giá';
+        });
+    }
+    
+    // Hàm tính tổng giá trị
+    function updateTotalValue(priceInput, amountInput, totalElement) {
+        const price = parseFloat(priceInput.value.replace(/,/g, '')) || 0;
+        const amount = parseInt(amountInput.value) || 0;
+        const total = price * amount;
+        
+        totalElement.textContent = formatPrice(total) + ' VND';
+    }
+    
+    // Hàm định dạng giá tiền
+    function formatPrice(price) {
+        return price.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ",");
+    }
+});
 </script>
 {% endblock %}

@@ -190,6 +190,7 @@ main {
 }
 
 .notification {
+    box-sizing: content-box;
     background-color: #e77471;
     color: white;
     padding: 10px 15px;

@@ -4,29 +4,13 @@ from accounts.models import User
 
 
 
-# ======== khởi tạo lấy dữ liệu chứng khoán ==============
-from .vnstock_services import get_list_stock_market
-list_stock = get_list_stock_market()
-
-
 # =============== Bảng cổ phiếu mà người dùng có ======================
 class UserAssets(models.Model):
     user = models.ForeignKey(User, on_delete=models.CASCADE, related_name='assets')
-    stock_code = models.CharField(max_length=10)
+    stock_code = models.CharField(max_length=3)
     amount = models.PositiveIntegerField()
-    
-    def clean(self):
-        from django.core.exceptions import ValidationError
-        # Check if stock_code exists in list_stock
-        if self.stock_code.upper() not in list_stock:
-            raise ValidationError(f"Stock code '{self.stock_code}' is not valid.")
-        # Convert to uppercase to standardize
-        self.stock_code = self.stock_code.upper()
-        super().clean()
-    
-    def save(self, *args, **kwargs):
-        self.clean()
-        super().save(*args, **kwargs)
+    # buy_price = models.DecimalField(max_digits=16, decimal_places=0)
+    # company_name = models.CharField(max_length=200)
     
     class Meta:
         unique_together = ('user', 'stock_code')  # khóa chính
@@ -49,10 +33,10 @@ class StockTransactions(models.Model):
     
     def __str__(self):
         action = "Sold" if self.is_sell else "Bought"
-        return f"{self.user.username} {action} {self.amount} {self.stock.stock_code} at {self.price}"
+        return f"{self.user.username} {action} {self.amount} {self.stock_code} at {self.price}"
     
 
-    
+
 # ========= BANK ACCOUNT ==================
 class UserBankAccounts(models.Model):
     user = models.ForeignKey(User, on_delete=models.CASCADE, related_name='bank_accounts')

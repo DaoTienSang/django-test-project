@@ -172,8 +172,7 @@
 }
 
 /* Trading history */
-.trading-history,
-.portfolio-section {
+.trading-history {
     background-color: #fff;
     border-radius: 8px;
     padding: 20px;
@@ -181,16 +180,14 @@
     margin-bottom: 20px;
 }
 
-.history-header,
-.portfolio-header {
+.history-header {
     display: flex;
     justify-content: space-between;
     align-items: center;
     margin-bottom: 15px;
 }
 
-.history-header h3,
-.portfolio-header h3 {
+.history-header h3 {
     font-size: 18px;
     color: #333;
     margin: 0;
@@ -260,8 +257,6 @@ table th {
     padding: 20px;
 }
 
-
-
 /* Responsive */
 @media (max-width: 768px) {
     .info-cards {
@@ -284,4 +279,134 @@ table th {
     .form-actions button {
         width: 100%;
     }
+}
+
+
+/* === MODAL */
+/* Modal styles */
+.modal {
+    display: none;
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background-color: rgba(0, 0, 0, 0.5);
+    z-index: 1000;
+    /* Add these properties to center the modal */
+    display: none; /* Will be changed to flex when modal is shown */
+    align-items: center;
+    justify-content: center;
+}
+
+.modal-content {
+    background-color: white;
+    border-radius: 8px;
+    box-shadow: 0 4px 20px rgba(0, 0, 0, 0.2);
+    width: 90%;
+    max-width: 500px;
+    padding: 24px;
+    position: relative;
+    /* Add animation for smoother appearance */
+    animation: modalFadeIn 0.3s ease;
+    /* Remove any potential positioning that would override centering */
+    margin: 0 auto;
+}
+
+@keyframes modalFadeIn {
+    from { opacity: 0; transform: scale(0.95); }
+    to { opacity: 1; transform: scale(1); }
+}
+
+.close-modal {
+    position: absolute;
+    top: 16px;
+    right: 16px;
+    font-size: 24px;
+    cursor: pointer;
+    color: #666;
+}
+
+.close-modal:hover {
+    color: #333;
+}
+
+.modal h2 {
+    margin-top: 0;
+    color: #333;
+    border-bottom: 1px solid #eee;
+    padding-bottom: 12px;
+    margin-bottom: 16px;
+}
+
+.confirmation-details {
+    background-color: #f9f9f9;
+    border-radius: 6px;
+    padding: 16px;
+    margin: 16px 0;
+}
+
+.confirmation-details p {
+    margin: 8px 0;
+    display: flex;
+    justify-content: space-between;
+}
+
+.confirmation-details strong {
+    color: #555;
+}
+
+.modal-actions {
+    display: flex;
+    justify-content: flex-end;
+    gap: 12px;
+    margin-top: 20px;
+}
+
+.btn-cancel {
+    background-color: #e0e0e0;
+    color: #333;
+    border: none;
+    border-radius: 4px;
+    padding: 10px 16px;
+    cursor: pointer;
+    font-weight: 500;
+    transition: background-color 0.2s;
+}
+
+.btn-cancel:hover {
+    background-color: #d0d0d0;
+}
+
+.btn-confirm {
+    background-color: #4CAF50;
+    color: white;
+    border: none;
+    border-radius: 4px;
+    padding: 10px 16px;
+    cursor: pointer;
+    font-weight: 500;
+    transition: background-color 0.2s;
+}
+
+.btn-confirm:hover {
+    background-color: #3e8e41;
+}
+
+/* Styles for the sell modal */
+#sell-confirmation-modal .modal-content {
+    border-top: 4px solid #ff6b6b;
+}
+
+#sell-confirmation-modal .btn-confirm {
+    background-color: #ff6b6b;
+}
+
+#sell-confirmation-modal .btn-confirm:hover {
+    background-color: #ff5252;
+}
+
+/* Styles for the buy modal */
+#confirmation-modal .modal-content {
+    border-top: 4px solid #4CAF50;
 }
