@@ -17,11 +17,11 @@ def get_ticker_companyname():
 
 
 # - Lấy giá khớp lệnh gần nhất của cổ phiếu
-def get_match_price(stock_code):
+def get_refer_price(stock_code):
     try:
         data = stock.trading.price_board(symbols_list=[stock_code])
-        match_price = int(data[('match', 'match_price')].iloc[0])
-        return match_price
+        ref_price = int(data[('listing', 'ref_price')].iloc[0])
+        return ref_price
     except Exception as e:
         return f'Không tìm thấy mã cổ phiếu {stock_code}!'
 

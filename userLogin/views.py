@@ -11,7 +11,7 @@ from django.http import Http404
 from accounts.models import User
 from .models import WalletTransactions, StockTransactions, UserBankAccounts, UserAssets
 
-from .vnstock_services import stock, get_ticker_companyname, get_match_price
+from .vnstock_services import stock, get_ticker_companyname, get_refer_price
 
 import random
 import string
@@ -50,7 +50,7 @@ def assets_management(request):
         
         # Lấy giá hiện tại
         try:
-            current_price = get_match_price(user_stock.stock_code)
+            current_price = get_refer_price(user_stock.stock_code)
             if current_price:
                 current_price = Decimal(str(current_price))
         except:
@@ -189,7 +189,7 @@ def deposit_management(request):
                 messages.error(request, "Vui lòng nhập số hợp lệ.")
         return redirect("userLogin:deposit")
     user_banks = UserBankAccounts.objects.filter(user=request.user)
-    history_deposit = WalletTransactions.objects.filter(user=request.user).order_by('-time')
+    history_deposit = WalletTransactions.objects.filter(user=request.user, transaction_type='D').order_by('-time')
     one_month_ago = timezone.now() - relativedelta(months=1)
     amount_deposit_amonth = history_deposit.filter(time__gte=one_month_ago).aggregate(Sum('amount'))['amount__sum'] or 0
     context = {
@@ -364,7 +364,7 @@ def trading_management(request):
 
     return render(request, 'userLogin/trading_management.html', context)
 
-    
+
 
 # - BUY STOCK VIEW
 @login_required
@@ -390,17 +390,31 @@ def buy_stock(request):
                 # Trừ tiền trong tài khoản người dùng
                 user.balance = F("balance") - total_value
                 user.save(update_fields=["balance"])
+                try:
+                    user_asset = UserAssets.objects.get(user=user, stock_code=stock_code)
+                    
 
-                # Cập nhật hoặc tạo mới UserAssets (cổ phiếu sở hữu)
-                user_asset, created = UserAssets.objects.get_or_create(
-                    user=user,
-                    stock_code=stock_code,
-                    # buy_price=stock_price,    
-                    defaults={"amount": stock_amount}
-                )
-                if not created:
-                    user_asset.amount = F("amount") + stock_amount
-                    user_asset.save(update_fields=["amount"])
+                except UserAssets.DoesNotExist:
+                    UserAssets.objects.create(
+                        user                = user,
+                        stock_code          = stock_code,
+                        amount              = stock_amount,
+                        average_buy_price   = stock_price,
+                    )
+
+                # # Cập nhật hoặc tạo mới UserAssets (cổ phiếu sở hữu)
+                # user_asset, created = UserAssets.objects.get_or_create(
+                #     user=user,
+                #     stock_code=stock_code,
+                #     # average_buy_price=stock_price,
+                #     defaults={"amount": stock_amount}
+                # )
+                # if not created:
+                #     old_buy_price = user_asset.average_buy_price
+                    
+                #     user_asset.amount = F("amount") + stock_amount
+                #     user_asset.save(update_fields=["amount"])
+                    
 
                 # Ghi lại giao dịch mua vào StockTransactions
                 user.refresh_from_db()      

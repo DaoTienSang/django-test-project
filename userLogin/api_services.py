@@ -6,7 +6,7 @@ from rest_framework.response import Response
 from rest_framework.permissions import IsAuthenticated
 from .serializers import WalletTransactionSerializer
 
-from .vnstock_services import get_match_price
+from .vnstock_services import get_refer_price
 
 from .models import WalletTransactions
 
@@ -25,12 +25,12 @@ def transaction_detail(request, id):
 @permission_classes([IsAuthenticated])
 def stock_price_api(request, stock_code):
     """API lấy giá khớp lệnh của mã chứng khoán"""
-    match_price = get_match_price(stock_code)
+    ref_price = get_refer_price(stock_code)
     
-    if match_price is not None:
+    if ref_price is not None:
         return Response({
             "stock_code": stock_code,
-            "match_price": match_price
+            "ref_price": ref_price
         }, status=status.HTTP_200_OK)
     else:
         return Response({

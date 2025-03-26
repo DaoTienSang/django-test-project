@@ -53,7 +53,7 @@ function connectWebSocket(stockCode) {
             console.log('Historical data loaded:', data);
         } else {
 //             // Handle real-time data (if implemented)
-//             // const newCandle = {
+//             // const newCandle = {http://127.0.0.1:8000/trading/
 //             //     time: Math.floor(new Date(candle.time).getTime() / 1000),
 //             //     open: parseFloat(candle.open),
 //             //     high: parseFloat(candle.high),

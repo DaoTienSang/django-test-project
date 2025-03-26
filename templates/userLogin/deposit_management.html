@@ -99,7 +99,7 @@
                     <tr>
                         <td>{{h.id}}</td>
                         <td>{{h.time}}</td>
-                        <td>{{h.amount|intcomma}} VND</td>
+                        <td>+ {{h.amount|intcomma}} VND</td>
                         <td>{{h.description}}</td>
                         <td class="status {%if h.status == 'P' %}
                                         status-processing
@@ -108,7 +108,7 @@
                                         {% else %}
                                         status-cancalled
                                         {% endif %}"><p>{{h.get_status_display}}</p></td>
-                        <td><button class="btn-detail">Chi tiết</button></td>
+                        <td><button class="btn-detail" data-id="{{ h.id }}">Chi tiết</button></td>
                     </tr>
                     {% empty %}
                     <tr>
@@ -308,6 +308,58 @@
             const seconds = String(date.getSeconds()).padStart(2, '0');
     
             return `${year}-${month}-${day} ${hours}:${minutes}:${seconds}`;
+        }
+        // Hàm lấy chi tiết giao dịch
+        function fetchTransactionDetail(id) {
+            // Giả định API endpoint
+            fetch(`/api/transaction/${id}/`)
+                .then(response => response.json())
+                .then(data => {
+                    console.log(data)
+                    
+                    const contentDiv = document.getElementById('transaction-detail-content');
+                    contentDiv.innerHTML = `
+                        <div class="detail-item">
+                            <span class="label">Mã giao dịch:</span>
+                            <span class="value">#POS-${data.id}</span>
+                        </div>
+                        <div class="detail-item">
+                            <span class="label">Ngày giao dịch:</span>
+                            <span class="value">${formatISODate(data.time)}</span>
+                        </div>
+                        <div class="detail-item">
+                            <span class="label">Số tiền:</span>
+                            <span class="value">+ ${data.amount.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ",")} VND</span>
+                        </div>
+                        <div class="detail-item">
+                            <span class="label">Số tiền còn lại:</span>
+                            <span class="value">${data.balance_after.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ",")} VND</span>
+                        </div>
+                        <div class="detail-item">
+                            <span class="label">Ngân hàng:</span>
+                            <span class="value">${data.bank_info.bank_name}</span>
+                        </div>
+                        <div class="detail-item">
+                            <span class="label">Số tài khoản:</span>
+                            <span class="value">${data.bank_info.account_number}</span>
+                        </div>
+                        <div class="detail-item">
+                            <span class="label">Tên chủ tài khoản:</span>
+                            <span class="value">${data.bank_info.account_name}</span>
+                        </div>
+                        <div class="detail-item">
+                            <span class="label">Trạng thái:</span>
+                            <span class="value status-${data.status.toLowerCase()}">${data.status_display}</span>
+                        </div>
+                        <div class="detail-item">
+                            <span class="label">Ghi chú:</span>
+                            <span class="value">${data.description || 'Không có'}</span>
+                        </div>
+                    `;
+                })
+                .catch(error => {
+                    console.error('Error fetching transaction details:', error);
+                });
         }
     });
 

@@ -410,3 +410,13 @@ table th {
 #confirmation-modal .modal-content {
     border-top: 4px solid #4CAF50;
 }
+
+.type-buy {
+    color: #10b981;
+    font-weight: 500;
+}
+
+.type-sell {
+    color: #ef4444;
+    font-weight: 500;
+}

@@ -9,7 +9,7 @@ class UserAssets(models.Model):
     user = models.ForeignKey(User, on_delete=models.CASCADE, related_name='assets')
     stock_code = models.CharField(max_length=3)
     amount = models.PositiveIntegerField()
-    # buy_price = models.DecimalField(max_digits=16, decimal_places=0)
+    average_buy_price = models.DecimalField(max_digits=16, decimal_places=0, null=True, blank=True)
     # company_name = models.CharField(max_length=200)
     
     class Meta:
@@ -70,7 +70,7 @@ class WalletTransactions(models.Model):
     user = models.ForeignKey(User, on_delete=models.CASCADE, related_name='wallet_transactions')
     amount = models.PositiveIntegerField()
     transaction_type = models.CharField(max_length=1, choices=TRANSACTION_TYPE_CHOICES)
-    description = models.CharField(max_length=200, blank=True, null=True)
+    description = models.CharField(max_length=200,  blank=True, null=True)
     balance_after = models.DecimalField(max_digits=16, decimal_places=0)
     status = models.CharField(max_length=1, choices=STATUS_CHOICES, default='P')
     time = models.DateTimeField(auto_now_add=True)

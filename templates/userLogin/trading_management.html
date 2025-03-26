@@ -65,7 +65,7 @@
                     
                     <div class="form-group">
                         <label for="buy-stock-price">Giá hiện tại (VND)</label>
-                        <input type="text" name="stock-price" id="buy-stock-price">
+                        <input type="text" name="stock-price" id="buy-stock-price" placeholder="Nhập giá muốn mua...">
                     </div>
                     
                     <div class="form-group">
@@ -192,7 +192,7 @@
                         <td>{{ transaction.time|date:"d/m/Y H:i" }}</td>
                         <td>{{ transaction.stock_code }}</td>
                         <td class="transaction-type ">
-                            {% if transaction.is_sell %} <span>Bán</span> {% else %} <span>Mua</span> {% endif %}
+                            {% if transaction.is_sell %} <span class="type-sell">Bán</span> {% else %} <span class="type-buy">Mua</span> {% endif %}
                         </td>
                         <td>{{ transaction.amount }}</td>
                         <td>{{ transaction.price|intcomma }} VND</td>
@@ -412,7 +412,7 @@
             return response.json();
         })
         .then(data => {
-            priceInput.value = formatPrice(data.match_price);
+            priceInput.value = formatPrice(data.ref_price);
             updateTotalValue(priceInput, amountInput, totalElement);
         })
         .catch(error => {
