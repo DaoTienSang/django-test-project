@@ -21,5 +21,6 @@ urlpatterns = [
 
     # API
     path('api/transaction/<int:id>/', api_services.transaction_detail, name='transaction-detail'),      # Chi tiết giao dịch
-    path('api/stock-price/<str:stock_code>/', api_services.stock_price_api, name='stock_price_api'),    # Giá khớp lệnh cổ phiếu
+    path('api/stock-price/<str:stock_code>/', api_services.stock_price_api, name='stock_price_api'),    # Giá tham chiếu cổ phiếu
+    path('api/historical-data/<str:stock_code>/', api_services.get_historical_data_api, name='get_historical_data_api'),    # Giá lịch sử cổ phiếu
 ]

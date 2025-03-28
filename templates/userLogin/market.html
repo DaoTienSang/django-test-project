@@ -32,13 +32,16 @@
                     <th>Khối lượng</th>
                 </tr>
             </thead>
-            <!-- <tbody>
-                {% for stock_board in price_board %}
-                {% empty %}
-                <p>Nothing</p>
-                {% endfor %}
-            </tbody> -->
         </table>
+    </div>
+    
+    <!-- Chart Modal -->
+    <div id="chartModal" class="chart-modal">
+        <div class="chart-modal-content">
+            <span class="close-modal">&times;</span>
+            <h2 id="chartTitle">Biểu đồ giá cổ phiếu <span id="stockSymbol"></span></h2>
+            <div id="chart-container" class="chart-container"></div>
+        </div>
     </div>
 </main>
 
@@ -51,8 +54,6 @@
             const data = price_board.data
             const columns = price_board.columns
 
-            // console.log(data.length);
-
             let symbol_index = null
             let ceiling_index = null
             let floor_index = null
@@ -61,7 +62,6 @@
             let match_price_index = null
 
             for (var i = 0; i < columns.length; i++) {
-                // console.log(columns[i][1]);
                 if (columns[i][1] == "symbol"){
                     symbol_index = i;
                 }
@@ -81,8 +81,6 @@
                     match_price_index = i;
                 }
             }
-            // console.log(symbol, ceiling, floor, ref_price, match_vol, match_price);
-            // console.log(symbol_index ,ceiling_index ,floor_index ,ref_price_index ,match_vol_index ,match_price_index);
 
             const table_body = document.createElement("tbody");
             
@@ -109,7 +107,6 @@
                 }
             }
             table_body_content += "</tbody>";
-            // console.log(table_body_content);
             table_body.innerHTML = table_body_content;
             table.appendChild(table_body);
             
@@ -130,13 +127,138 @@
                     }
                 });
             });
+            
+            
+            // Add click event to stock symbols to show chart
+            const rows = table.querySelectorAll('tbody tr');
+            rows.forEach(row => {
+                row.addEventListener('click', function() {
+                    const stockSymbol = this.cells[0].textContent;
+                    // console.log(stockSymbol);
+                    showChart(stockSymbol);
+                });
+                
+                // Make the row look clickable
+                row.style.cursor = 'pointer';
+            });
         }
 
-
-        // Lấy dữ data vẽ biểu đồ
+        // -------------- Chart Modal Functionality
+        const modal = document.getElementById("chartModal");
+        const closeBtn = document.querySelector(".close-modal"); // Get the existing close button
         
+        // Close the modal when clicking the X
+        closeBtn.onclick = function() {
+            modal.style.display = "none";
+            // If we have a chart, need to clean up
+            if (typeof chart !== 'undefined' && chart !== null) {
+                chart.remove();
+                chart = null;
+                candleSeries = null;
+            }
+        }
         
+        // Close the modal when clicking outside of it
+        window.onclick = function(event) {
+            if (event.target == modal) {
+                modal.style.display = "none";
+                // If we have a chart, need to clean up
+                if (typeof chart !== 'undefined' && chart !== null) {
+                    chart.remove();
+                    chart = null;
+                    candleSeries = null;
+                }
+            }
+        }
+        
+        let chart = null;
+        let candleSeries = null;
+        
+        // Function to show the chart
+        function showChart(stockCode) {
+            // Display the modal
+            document.getElementById('stockSymbol').textContent = stockCode;
+            modal.style.display = "block";
+            
+            // Create chart if it doesn't exist
+            createChart();
+            
+            // Load data from API
+            loadChartData(stockCode);
+        }
+        
+        // Function to create the chart
+        function createChart() {
+            // Clear the chart container
+            const chartContainer = document.getElementById('chart-container');
+            chartContainer.innerHTML = '';
+            
+            // Create a new chart
+            chart = LightweightCharts.createChart(chartContainer, {
+                width: chartContainer.clientWidth,
+                // height: 400,
+                layout: { backgroundColor: '#FFFFFF', textColor: 'black' },
+                grid: { vertLines: { color: '#E0E3EB' }, horzLines: { color: '#E0E3EB' } },
+                timeScale: { timeVisible: true, secondsVisible: false },
+                rightPriceScale: {
+                    borderColor: '#D6DCDE',
+                },
+                crosshair: {
+                    mode: LightweightCharts.CrosshairMode.Normal,
+                },
+            });
+            
+            // Make chart responsive
+            window.addEventListener('resize', function() {
+                if (chart) {
+                    chart.applyOptions({
+                        width: chartContainer.clientWidth
+                    });
+                }
+            });
+            
+            // Add candlestick series
+            candleSeries = chart.addCandlestickSeries({
+                upColor: '#26a69a', 
+                downColor: '#ef5350', 
+                borderVisible: false,
+                wickUpColor: '#26a69a', 
+                wickDownColor: '#ef5350'
+            });
+        }
+        
+        // Function to load chart data from API
+        function loadChartData(stockCode) {
+            axios.get(`/api/historical-data/${stockCode}`)
+                .then(response => {
+                    const apiData = response.data;
+                    if (apiData && apiData.data && Array.isArray(apiData.data)) {
+                        // Format data for the chart
+                        const chartData = apiData.data.map(item => ({
+                            time: Math.floor(new Date(item.time).getTime() / 1000),
+                            open: parseFloat(item.open),
+                            high: parseFloat(item.high),
+                            low: parseFloat(item.low),
+                            close: parseFloat(item.close)
+                        }));
+                        
+                        // Set the data to the chart
+                        if (candleSeries) {
+                            candleSeries.setData(chartData);
+                        }
+                    } else {
+                        console.error("Invalid data format from API");
+                    }
+                })
+                .catch(error => {
+                    console.error("Error fetching chart data:", error);
+                    // Display a message to the user
+                    document.getElementById('chart-container').innerHTML = 
+                        '<div class="error-message">Failed to load chart data. Please try again later.</div>';
+                });
+        }
     });
 </script>
-
+<script src="https://unpkg.com/lightweight-charts@3.8.0/dist/lightweight-charts.standalone.production.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/axios/dist/axios.min.js"></script>
 {% endblock %}

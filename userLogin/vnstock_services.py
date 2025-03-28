@@ -4,6 +4,7 @@ from datetime import datetime
 from vnstock import Vnstock
 
 
+
 stock = Vnstock().stock(source='VCI')
 
 def get_list_stock_market():
@@ -37,4 +38,4 @@ def get_price_board():
 # ==== Lấy giá lịch sử ====
 def get_historical_data(stock_code):
     today = datetime.now().strftime('%Y-%m-%d')
-    return Vnstock().stock(symbol=stock_code, source='VCI').quote.history(start='2000-01-01', end=today)
+    return stock.quote.history(symbol=stock_code, start='2000-01-01', end=today)
