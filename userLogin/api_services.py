@@ -42,14 +42,10 @@ def stock_price_api(request, stock_code):
 @api_view(['GET'])
 @permission_classes([IsAuthenticated])
 def get_historical_data_api(request, stock_code):
-    print('+'*100)
-    # stock_code = request.query_params.get("stock_code")  # Lấy mã từ query string
-
     if not stock_code:
         return Response({"error": "Vui lòng cung cấp mã cổ phiếu!"}, status=status.HTTP_400_BAD_REQUEST)
 
     data = get_historical_data(stock_code)
-    print(data)
     if data is not None and not data.empty:
         data_json = data.to_dict(orient="records")  
         return Response({
