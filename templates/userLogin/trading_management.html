@@ -164,13 +164,13 @@
     <div class="trading-history">
         <div class="history-header">
             <h3>Lịch sử giao dịch</h3>
-            <div class="history-filter">
+            <!-- <div class="history-filter">
                 <select id="transaction-type-filter">
                     <option value="all">Tất cả giao dịch</option>
                     <option value="buy">Mua</option>
                     <option value="sell">Bán</option>
                 </select>
-            </div>
+            </div> -->
         </div>
         <div class="table-container">
             <table>
@@ -252,6 +252,21 @@
             alert(`Không tìm thấy mã cổ phiếu`);
         }
     });
+
+    // Định dạng giá khi nhập
+    if (buyStockPriceInput) {
+        buyStockPriceInput.addEventListener('input', function(e) {
+            // Xóa tất cả ký tự không phải số
+            let value = this.value.replace(/\D/g, '');
+            // Format với dấu phẩy ngăn cách hàng nghìn
+            if (value) {
+                // this.value = parseInt(value).toLocaleString('vi-VN');
+                this.value = value.replace(/\B(?=(\d{3})+(?!\d))/g, ",");
+            } else {
+                this.value = '';
+            }
+        });
+    }
     
     // Cập nhật tổng giá trị khi thay đổi số lượng
     buyStockAmountInput.addEventListener('input', function() {

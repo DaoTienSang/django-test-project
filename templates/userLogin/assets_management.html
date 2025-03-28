@@ -30,31 +30,37 @@
             <div class="stat-icon">💼</div>
             <div class="stat-info">
                 <h3>Tổng giá trị danh mục</h3>
-                <p class="stat-value">857,500,000 VND</p>
-                <p class="stat-change increase">+3.8% <span>từ tháng trước</span></p>
+                <p class="stat-value">{{ portfolio_value|intcomma }} VND</p>
+                <!-- <p class="stat-change increase">% <span>từ tháng trước</span></p> -->
             </div>
         </div>
         <div class="stat-card">
             <div class="stat-icon">💰</div>
             <div class="stat-info">
                 <h3>Lợi nhuận/Lỗ</h3>
-                <p class="stat-value">32,800,000 VND</p>
-                <p class="stat-change increase">+6.2% <span>từ tháng trước</span></p>
+                {% if total_profit_loss > 0 %}
+                <p class="stat-value status-profit">+{{ total_profit_loss|intcomma }} VND</p>
+                {% elif total_profit_loss < 0 %}
+                <p class="stat-value status-loss">{{ total_profit_loss|intcomma }} VND</p>
+                {% else %}
+                <p class="stat-value status-breakeven">{{ total_profit_loss|intcomma }} VND</p>
+                {% endif %}
+                <!-- <p class="stat-change increase">+6.2% <span>từ tháng trước</span></p> -->
             </div>
         </div>
         <div class="stat-card">
             <div class="stat-icon">📊</div>
             <div class="stat-info">
                 <h3>Số mã cổ phiếu</h3>
-                <p class="stat-value">15</p>
-                <p class="stat-change increase">+2 <span>từ tháng trước</span></p>
+                <p class="stat-value">{{ number_of_stock }}</p>
+                <!-- <p class="stat-change increase">+2 <span>từ tháng trước</span></p> -->
             </div>
         </div>
         <div class="stat-card">
             <div class="stat-icon">📈</div>
             <div class="stat-info">
                 <h3>Cổ phiếu tăng/giảm</h3>
-                <p class="stat-value">11/4</p>
+                <p class="stat-value">{{ number_profit_stock }}/{{ number_loss_stock }}</p>
                 <p class="stat-change increase">+5% <span>hiệu suất</span></p>
             </div>
         </div>
@@ -97,16 +103,42 @@
                         <th>Số lượng</th>
                         <th>Giá mua</th>
                         <th>Giá hiện tại</th>
-                        <th>Thay đổi</th>
                         <th>Giá trị</th>
+                        <th>Thay đổi</th>
                         <th>Lãi/Lỗ</th>
                     </tr>
                 </thead>
                 <tbody>
+                    {% for portfolio in portfolios %}
                     <tr>
+                        <td>{{portfolio.stock_code}}</td>
+                        <td>{{portfolio.company_name}}</td>
+                        <td>{{portfolio.amount}}</td>
+                        <td>{{portfolio.avg_buy_price|intcomma}}</td>
+                        <td>{{portfolio.current_price|intcomma}}</td>
+                        <td>{{portfolio.total_value|intcomma}}</td>
+                        {% if portfolio.profit_loss > 0 %}
+                        <td class="status-profit">+ {{ portfolio.price_change_percent }} %</td>
+                        <td class="status-profit">+ {{ portfolio.profit_loss|intcomma }}</td>
+                        {% elif portfolio.profit_loss < 0 %}
+                        <td class="status-loss">{{ portfolio.price_change_percent }} %</td>
+                        <td class="status-loss">{{ portfolio.profit_loss|intcomma }}</td>
+                        {% else %}
+                        <td class="status-breakeven">{{ portfolio.price_change_percent }} %</td>
+                        <td class="status-breakeven">{{ portfolio.profit_loss|intcomma }}</td>
+                        {% endif %}
+
+                        <!-- <td class="{% if portfolio.profit_loss > 0 %} status-profit {% elif portfolio.profit_loss < 0 %} status-loss {% else %} status-breakeven {% endif %}">{{ portfolio.price_change_percent }} %</td>
+                        <td class="{% if portfolio.profit_loss > 0 %} status-profit {% elif portfolio.profit_loss < 0 %} status-loss {% else %} status-breakeven {% endif %}">{{ portfolio.profit_loss|intcomma }}</td> -->
+                    </tr>
+                    {% empty %}
+                    <tr>
+                        <td colspan="6" class="no-data">Chưa có tài sản nào</td>
+                    </tr>
+                    {% endfor %}
+                    <!-- <tr>
                         <td>VNM</td>
                         <td>CTCP Sữa Việt Nam</td>
-                        <!-- <td>Thực phẩm</td> -->
                         <td>2,000</td>
                         <td>75,000</td>
                         <td>82,500</td>
@@ -117,7 +149,6 @@
                     <tr>
                         <td>FPT</td>
                         <td>Tập đoàn FPT</td>
-                        <!-- <td>Công nghệ</td> -->
                         <td>1,500</td>
                         <td>90,000</td>
                         <td>98,500</td>
@@ -128,7 +159,6 @@
                     <tr>
                         <td>MWG</td>
                         <td>CTCP Thế Giới Di Động</td>
-                        <!-- <td>Bán lẻ</td> -->
                         <td>1,800</td>
                         <td>125,000</td>
                         <td>115,000</td>
@@ -139,7 +169,6 @@
                     <tr>
                         <td>VIC</td>
                         <td>Tập đoàn Vingroup</td>
-                        <!-- <td>Bất động sản</td> -->
                         <td>1,000</td>
                         <td>105,000</td>
                         <td>112,500</td>
@@ -150,7 +179,6 @@
                     <tr>
                         <td>HPG</td>
                         <td>CTCP Tập đoàn Hòa Phát</td>
-                        <!-- <td>Thép</td> -->
                         <td>5,000</td>
                         <td>31,500</td>
                         <td>33,200</td>
@@ -161,14 +189,13 @@
                     <tr>
                         <td>VHM</td>
                         <td>CTCP Vinhomes</td>
-                        <!-- <td>Bất động sản</td> -->
                         <td>800</td>
                         <td>80,000</td>
                         <td>74,500</td>
                         <td class="type-sell">-6.9%</td>
                         <td>59,600,000 VND</td>
                         <td class="status-pending">-4,400,000 VND</td>
-                    </tr>
+                    </tr> -->
                 </tbody>
             </table>
         </div>
@@ -190,7 +217,6 @@
                         <th>Số lượng</th>
                         <th>Giá</th>
                         <th>Tổng giá trị</th>
-                        <th>Phí giao dịch</th>
                         <th>Trạng thái</th>
                     </tr>
                 </thead>
@@ -202,7 +228,6 @@
                         <td>500</td>
                         <td>82,500 VND</td>
                         <td>41,250,000 VND</td>
-                        <td>41,250 VND</td>
                         <td class="status-completed">Hoàn thành</td>
                     </tr>
                     <tr>
@@ -212,7 +237,6 @@
                         <td>300</td>
                         <td>74,500 VND</td>
                         <td>22,350,000 VND</td>
-                        <td>22,350 VND</td>
                         <td class="status-completed">Hoàn thành</td>
                     </tr>
                     <tr>
@@ -222,7 +246,6 @@
                         <td>400</td>
                         <td>98,000 VND</td>
                         <td>39,200,000 VND</td>
-                        <td>39,200 VND</td>
                         <td class="status-completed">Hoàn thành</td>
                     </tr>
                     <tr>
@@ -232,7 +255,6 @@
                         <td>200</td>
                         <td>98,500 VND</td>
                         <td>19,700,000 VND</td>
-                        <td>19,700 VND</td>
                         <td class="status-completed">Hoàn thành</td>
                     </tr>
                 </tbody>

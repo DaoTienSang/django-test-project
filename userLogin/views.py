@@ -29,79 +29,68 @@ def dashboard(request):
 # ========== view xem tài sản ==================
 @login_required
 def assets_management(request):
-    # Lấy thông tin về số dư của user
-    user_balance = request.user.balance
-    
+    user = request.user
+
     # Lấy danh sách cổ phiếu mà user đang sở hữu
-    user_stocks = UserAssets.objects.filter(user=request.user)
+    user_stocks = UserAssets.objects.filter(user=user)
     
     # Lấy thông tin về các mã cổ phiếu và tên công ty
     list_stock_market = get_ticker_companyname()
     ticker_to_company = {stock['ticker']: stock['organ_name'] for stock in list_stock_market}
     
-    # Tính tổng giá trị danh mục đầu tư
+    # Tổng giá trị danh mục đầu tư
     portfolio_value = Decimal('0')
+
+    # Tính lãi/lỗ = (Tổng giá hiện tại - tổng giá mua) * số lượng
+    total_profit_loss = Decimal('0')
+
+    # Số cổ phiếu có lãi
+    number_profit_stock = 0
     
     # Chuẩn bị dữ liệu về danh mục đầu tư
-    portfolio = []
+    portfolios = []
     for user_stock in user_stocks:
         # Lấy tên công ty
-        user_stock.organ_name = ticker_to_company.get(user_stock.stock_code, "Không có thông tin")
+        company_name = ticker_to_company.get(user_stock.stock_code, "Không có thông tin")
         
         # Lấy giá hiện tại
         try:
             current_price = get_refer_price(user_stock.stock_code)
             if current_price:
                 current_price = Decimal(str(current_price))
+            else:
+                current_price = Decimal('0')
         except:
             current_price = Decimal('0')
         
         # Tính tổng giá trị hiện tại của cổ phiếu
-        total_price_stock = current_price * user_stock.amount
-        portfolio_value += total_price_stock
-        
-        # Tính giá mua trung bình
-        avg_buy_data = StockTransactions.objects.filter(
-            user=request.user,
-            stock_code=user_stock.stock_code,
-            is_sell=False
-        ).aggregate(
-            total_cost=Sum(F('price') * F('amount')),
-            total_amount=Sum('amount')
-        )
-        
-        total_cost = avg_buy_data['total_cost'] or Decimal('0')
-        total_amount = avg_buy_data['total_amount'] or 0
-        
-        # Tính tổng số lượng đã bán
-        total_sold = StockTransactions.objects.filter(
-            user=request.user,
-            stock_code=user_stock.stock_code,
-            is_sell=True
-        ).aggregate(sum_amount=Sum('amount'))['sum_amount'] or 0
-        
-        # Tính giá mua trung bình
-        avg_buy_price = Decimal('0')
-        if total_amount > 0:
-            avg_buy_price = total_cost / total_amount
+        total_value = current_price * user_stock.amount
+        portfolio_value += total_value
+
+        # Giá mua trung bình
+        avg_buy_price = user_stock.average_buy_price
         
         # Tính lãi/lỗ
         profit_loss = (current_price - avg_buy_price) * user_stock.amount
-        profit_loss_percent = Decimal('0')
-        if avg_buy_price > 0:
-            profit_loss_percent = (current_price - avg_buy_price) / avg_buy_price * 100
+        total_profit_loss += profit_loss
+        if profit_loss >= 0:
+            number_profit_stock += 1
         
-        portfolio.append({
+        # Tính thay đổi giá (có thể là so với ngày hôm trước hoặc so với giá mua)
+        price_change = current_price - avg_buy_price
+        price_change_percent = Decimal('0')
+        if avg_buy_price > 0:
+            price_change_percent = (price_change / avg_buy_price) * 100
+        
+        portfolios.append({
             'stock_code': user_stock.stock_code,
-            # 'organ_name': organ_name,
+            'company_name': company_name,
             'amount': user_stock.amount,
             'avg_buy_price': avg_buy_price,
             'current_price': current_price,
-            # 'current_value': current_value,
+            'total_value': total_value,
+            'price_change_percent': round(price_change_percent, 2),
             'profit_loss': profit_loss,
-            'profit_loss_percent': profit_loss_percent,
-            'total_bought': total_amount,
-            'total_sold': total_sold
         })
     
     # Lấy 10 giao dịch gần nhất
@@ -114,34 +103,15 @@ def assets_management(request):
         transaction.organ_name = ticker_to_company.get(transaction.stock_code, "Không có thông tin")
         transaction.total_value = transaction.price * transaction.amount
     
-    # Tính các thống kê về tài sản
-    # Tổng tiền đã nạp vào hệ thống
-    total_deposit = WalletTransactions.objects.filter(
-        user=request.user,
-        transaction_type='D'
-    ).aggregate(total=Sum('amount'))['total'] or Decimal('0')
-    
-    # Tổng tiền đã rút
-    total_withdraw = WalletTransactions.objects.filter(
-        user=request.user,
-        transaction_type='W'
-    ).aggregate(total=Sum('amount'))['total'] or Decimal('0')
-    
-    # Tổng giá trị tài sản (số dư + giá trị danh mục)
-    total_assets_value = user_balance + portfolio_value
-    
-    # Lãi/lỗ tổng (tổng tài sản - tổng nạp + tổng rút)
-    total_profit_loss = total_assets_value - total_deposit + total_withdraw
-    
     context = {
-        'user_balance': user_balance,
-        'portfolio': portfolio,
+        # 'user_balance': user_balance,
         'portfolio_value': portfolio_value,
-        'recent_transactions': recent_transactions,
-        'total_deposit': total_deposit,
-        'total_withdraw': total_withdraw,
-        'total_assets_value': total_assets_value,
-        'total_profit_loss': total_profit_loss
+        'total_profit_loss': total_profit_loss,
+        'number_of_stock':len(user_stocks),
+        'number_profit_stock': number_profit_stock,
+        'number_loss_stock':len(user_stocks)-number_profit_stock,
+        'portfolios': portfolios,
+        # 'recent_transactions': recent_transactions,
     }
     
     return render(request, 'userLogin/assets_management.html', context)
@@ -369,73 +339,88 @@ def trading_management(request):
 # - BUY STOCK VIEW
 @login_required
 def buy_stock(request):
-    if request.method == "POST":
-        stock_code = request.POST.get("stock-code")  # Mã cổ phiếu
-        stock_price = request.POST.get("stock-price")  # Giá cổ phiếu
-        stock_amount = request.POST.get("stock-amount")  # Số lượng cổ phiếu muốn mua
+    if request.method != "POST":
+        return render(request, '404.html')
+    
+    try:
+        # Lấy thông tin từ form
+        stock_code = request.POST.get("stock-code")
+        stock_price_str = request.POST.get("stock-price", "0")
+        stock_amount_str = request.POST.get("stock-amount", "0")
         
-        # Chuyển đổi kiểu dữ liệu
-        stock_price = Decimal(stock_price.replace(',',''))
-        stock_amount = int(stock_amount)
-        total_value = stock_price * stock_amount  # Tổng giá trị giao dịch
-        user = request.user  # Lấy user hiện tại
-
-        # # Kiểm tra số dư của người dùng có đủ không
+        # Kiểm tra dữ liệu đầu vào
+        if not all([stock_code, stock_price_str, stock_amount_str]):
+            messages.error(request, "Vui lòng nhập đầy đủ thông tin giao dịch!")
+            return redirect("userLogin:trading")
+        
+        # Chuyển đổi và làm sạch dữ liệu
+        stock_price = Decimal(stock_price_str.replace(',',''))
+        stock_amount = int(stock_amount_str)
+        total_value = stock_price * stock_amount
+        
+        # Kiểm tra số lượng hợp lệ
+        if stock_amount <= 0:
+            messages.error(request, "Số lượng cổ phiếu phải lớn hơn 0!")
+            return redirect("userLogin:trading")
+        
+        # Kiểm tra số dư
+        user = request.user
         if user.balance < total_value:
-            messages.error(request, "Số dư không đủ để thực hiện giao dịch!")
+            messages.error(request, f"Số dư không đủ để thực hiện giao dịch! Cần {total_value:,} VND.")
             return redirect("userLogin:trading")
-        try:
-            # Bắt đầu giao dịch database
-            with transaction.atomic():
-                # Trừ tiền trong tài khoản người dùng
-                user.balance = F("balance") - total_value
-                user.save(update_fields=["balance"])
-                try:
-                    user_asset = UserAssets.objects.get(user=user, stock_code=stock_code)
-                    
-
-                except UserAssets.DoesNotExist:
-                    UserAssets.objects.create(
-                        user                = user,
-                        stock_code          = stock_code,
-                        amount              = stock_amount,
-                        average_buy_price   = stock_price,
-                    )
-
-                # # Cập nhật hoặc tạo mới UserAssets (cổ phiếu sở hữu)
-                # user_asset, created = UserAssets.objects.get_or_create(
-                #     user=user,
-                #     stock_code=stock_code,
-                #     # average_buy_price=stock_price,
-                #     defaults={"amount": stock_amount}
-                # )
-                # if not created:
-                #     old_buy_price = user_asset.average_buy_price
-                    
-                #     user_asset.amount = F("amount") + stock_amount
-                #     user_asset.save(update_fields=["amount"])
-                    
-
-                # Ghi lại giao dịch mua vào StockTransactions
-                user.refresh_from_db()      
-                StockTransactions.objects.create(
-                    user            = user,
-                    stock_code      = stock_code,
-                    is_sell         = False,  # False: giao dịch MUA
-                    price           = stock_price,
-                    amount          = stock_amount,
-                    balance_after   = user.balance,
-                    is_successful   = True,
+        
+        # Bắt đầu giao dịch database
+        with transaction.atomic():
+            # Trừ tiền trong tài khoản người dùng
+            user.balance = F("balance") - total_value
+            user.save(update_fields=["balance"])
+            user.refresh_from_db()
+            
+            # Cập nhật hoặc tạo mới tài sản cổ phiếu
+            try:
+                # Kiểm tra xem user đã có cổ phiếu này chưa
+                user_asset = UserAssets.objects.get(user=user, stock_code=stock_code)
+                
+                # Tính giá mua trung bình mới
+                current_total_value = user_asset.amount * user_asset.average_buy_price
+                new_total_value = current_total_value + (stock_amount * stock_price)
+                new_total_amount = user_asset.amount + stock_amount
+                new_average_price = new_total_value / new_total_amount
+                
+                # Cập nhật số lượng và giá trung bình
+                user_asset.amount = new_total_amount
+                user_asset.average_buy_price = new_average_price
+                user_asset.save()
+                
+            except UserAssets.DoesNotExist:
+                # Tạo mới nếu chưa có
+                UserAssets.objects.create(
+                    user=user,
+                    stock_code=stock_code,
+                    amount=stock_amount,
+                    average_buy_price=stock_price,
                 )
+            
+            # Ghi lại giao dịch vào lịch sử
+            StockTransactions.objects.create(
+                user=user,
+                stock_code=stock_code,
+                is_sell=False,  # False: giao dịch MUA
+                price=stock_price,
+                amount=stock_amount,
+                balance_after=user.balance,
+                is_successful=True,
+            )
+            
+            messages.success(request, f"Mua thành công {stock_amount} cổ phiếu {stock_code} với giá {stock_price:,} VND!")
+            
+    except ValueError as e:
+        messages.error(request, f"Dữ liệu không hợp lệ: {str(e)}")
+    except Exception as e:
+        messages.error(request, f"Có lỗi xảy ra: {str(e)}")
+    
+    return redirect("userLogin:trading")
 
-                messages.success(request, "Mua cổ phiếu thành công!")
-                return redirect("userLogin:trading")
-        except Exception as e:
-            messages.error(request, f"Có lỗi xảy ra: {e}")
-            return redirect("userLogin:trading")
-        return redirect("userLogin:trading")
-
-    return render(request, '404.html')
 
 
 

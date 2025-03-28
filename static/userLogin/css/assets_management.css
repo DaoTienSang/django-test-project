@@ -254,6 +254,17 @@ td {
     font-weight: 500;
 }
 
+/* status lời - lỗ - hòa */
+.status-profit{
+    color: #10b981;
+}
+.status-loss{
+    color: #ef4444;
+}
+.status-breakeven{
+    color: #c3bd0f;
+}
+
 /* Responsive */
 @media (max-width: 768px) {
     .dashboard-header {
