@@ -13,6 +13,7 @@ urlpatterns = [
     path("deposit/", views.deposit_management, name='deposit'),
     path('withdraw/', views.withdraw_management, name='withdraw'),
     path('trading/', views.trading_management, name='trading'),
+    path('market/', views.market, name='market'),
 
     path('add-bank-account/', views.add_bank_account, name='add_bank_account'),     # add bank account
     path('buy-stock/', views.buy_stock, name='buy_stock'),                          # buy stock

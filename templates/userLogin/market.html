@@ -1,0 +1,142 @@
+{% extends "userLogin/base_sidebar.html" %}
+
+{% load static %}
+{% load humanize %}
+
+
+{% block title %}Thị trường - SmartTrade{% endblock %}
+
+
+{% block css %}
+<link rel="stylesheet" href="{% static 'userLogin/css/market.css' %}">
+{% endblock %}
+
+
+{% block main-content %}
+<main class="market-content">
+    <div class="search-container">
+        <input type="text" id="stockSearch" placeholder="Tìm kiếm cổ phiếu..." class="stock-search">
+    </div>
+    <div class="table-container">
+        <table style="width:100%">
+            <thead>
+                <tr>
+                    <th rowspan="2">CK</th>
+                    <th rowspan="2">Trần</th>
+                    <th rowspan="2">Sàn</th>
+                    <th rowspan="2">TC</th>
+                    <th colspan="2">Khớp lệnh</th>
+                </tr>
+                <tr>
+                    <th>Giá</th>
+                    <th>Khối lượng</th>
+                </tr>
+            </thead>
+            <!-- <tbody>
+                {% for stock_board in price_board %}
+                {% empty %}
+                <p>Nothing</p>
+                {% endfor %}
+            </tbody> -->
+        </table>
+    </div>
+</main>
+
+<script>
+    document.addEventListener('DOMContentLoaded', function() {
+        const price_board = JSON.parse('{{ price_board_json|escapejs }}');
+        if (price_board){
+            const table = document.querySelector(".table-container table");
+            
+            const data = price_board.data
+            const columns = price_board.columns
+
+            // console.log(data.length);
+
+            let symbol_index = null
+            let ceiling_index = null
+            let floor_index = null
+            let ref_price_index = null
+            let match_vol_index = null
+            let match_price_index = null
+
+            for (var i = 0; i < columns.length; i++) {
+                // console.log(columns[i][1]);
+                if (columns[i][1] == "symbol"){
+                    symbol_index = i;
+                }
+                else if (columns[i][1] == "ceiling"){
+                    ceiling_index = i;
+                }
+                else if (columns[i][1] == "floor"){
+                    floor_index = i;
+                }
+                else if (columns[i][1] == "ref_price"){
+                    ref_price_index = i;
+                }
+                else if (columns[i][1] == "match_vol"){
+                    match_vol_index = i;
+                }
+                else if (columns[i][1] == "match_price"){
+                    match_price_index = i;
+                }
+            }
+            // console.log(symbol, ceiling, floor, ref_price, match_vol, match_price);
+            // console.log(symbol_index ,ceiling_index ,floor_index ,ref_price_index ,match_vol_index ,match_price_index);
+
+            const table_body = document.createElement("tbody");
+            
+            // Format functions
+            function formatPrice(price) {
+                return parseFloat(price/1000).toFixed(2);
+            }
+            
+            function formatVolume(volume) {
+                return parseFloat(volume).toLocaleString('en-US');
+            }
+            
+            let table_body_content = "<tbody>";
+            for (var i=0; i<data.length; i++){
+                if (data[i][symbol_index]){
+                    table_body_content += "<tr>";
+                    table_body_content += `<td>${data[i][symbol_index]}</td>`;
+                    table_body_content += `<td>${formatPrice(data[i][ceiling_index])}</td>`;
+                    table_body_content += `<td>${formatPrice(data[i][floor_index])}</td>`;
+                    table_body_content += `<td>${formatPrice(data[i][ref_price_index])}</td>`;
+                    table_body_content += `<td>${formatPrice(data[i][match_price_index])}</td>`;
+                    table_body_content += `<td>${formatVolume(data[i][match_vol_index])}</td>`;
+                    table_body_content += "</tr>";
+                }
+            }
+            table_body_content += "</tbody>";
+            // console.log(table_body_content);
+            table_body.innerHTML = table_body_content;
+            table.appendChild(table_body);
+            
+            // Add search functionality
+            const searchInput = document.getElementById('stockSearch');
+            searchInput.addEventListener('input', function() {
+                // Convert input value to uppercase and update the input field
+                this.value = this.value.toUpperCase();
+                const searchText = this.value;
+                const rows = table.querySelectorAll('tbody tr');
+                
+                rows.forEach(row => {
+                    const stockSymbol = row.cells[0].textContent;
+                    if (stockSymbol.toUpperCase().includes(searchText)) {
+                        row.style.display = '';
+                    } else {
+                        row.style.display = 'none';
+                    }
+                });
+            });
+        }
+
+
+        // Lấy dữ data vẽ biểu đồ
+        
+        
+    });
+</script>
+
+{% endblock %}

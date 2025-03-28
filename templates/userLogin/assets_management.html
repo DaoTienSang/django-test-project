@@ -91,7 +91,7 @@
     <div class="recent-transactions">
         <div class="section-header">
             <h2>Danh mục cổ phiếu</h2>
-            <a href="{% url 'userLogin:trading' %}" class="view-all">Thêm cổ phiếu</a>
+            <a href="{% url 'userLogin:trading' %}" class="view-all">Mua/Bán cổ phiếu</a>
         </div>
         <div class="table-container">
             <table>
@@ -128,74 +128,12 @@
                         <td class="status-breakeven">{{ portfolio.profit_loss|intcomma }}</td>
                         {% endif %}
 
-                        <!-- <td class="{% if portfolio.profit_loss > 0 %} status-profit {% elif portfolio.profit_loss < 0 %} status-loss {% else %} status-breakeven {% endif %}">{{ portfolio.price_change_percent }} %</td>
-                        <td class="{% if portfolio.profit_loss > 0 %} status-profit {% elif portfolio.profit_loss < 0 %} status-loss {% else %} status-breakeven {% endif %}">{{ portfolio.profit_loss|intcomma }}</td> -->
                     </tr>
                     {% empty %}
                     <tr>
                         <td colspan="6" class="no-data">Chưa có tài sản nào</td>
                     </tr>
                     {% endfor %}
-                    <!-- <tr>
-                        <td>VNM</td>
-                        <td>CTCP Sữa Việt Nam</td>
-                        <td>2,000</td>
-                        <td>75,000</td>
-                        <td>82,500</td>
-                        <td class="type-buy">+10.0%</td>
-                        <td>165,000,000 VND</td>
-                        <td class="status-completed">+15,000,000 VND</td>
-                    </tr>
-                    <tr>
-                        <td>FPT</td>
-                        <td>Tập đoàn FPT</td>
-                        <td>1,500</td>
-                        <td>90,000</td>
-                        <td>98,500</td>
-                        <td class="type-buy">+9.4%</td>
-                        <td>147,750,000 VND</td>
-                        <td class="status-completed">+12,750,000 VND</td>
-                    </tr>
-                    <tr>
-                        <td>MWG</td>
-                        <td>CTCP Thế Giới Di Động</td>
-                        <td>1,800</td>
-                        <td>125,000</td>
-                        <td>115,000</td>
-                        <td class="type-sell">-8.0%</td>
-                        <td>207,000,000 VND</td>
-                        <td class="status-pending">-18,000,000 VND</td>
-                    </tr>
-                    <tr>
-                        <td>VIC</td>
-                        <td>Tập đoàn Vingroup</td>
-                        <td>1,000</td>
-                        <td>105,000</td>
-                        <td>112,500</td>
-                        <td class="type-buy">+7.1%</td>
-                        <td>112,500,000 VND</td>
-                        <td class="status-completed">+7,500,000 VND</td>
-                    </tr>
-                    <tr>
-                        <td>HPG</td>
-                        <td>CTCP Tập đoàn Hòa Phát</td>
-                        <td>5,000</td>
-                        <td>31,500</td>
-                        <td>33,200</td>
-                        <td class="type-buy">+5.4%</td>
-                        <td>166,000,000 VND</td>
-                        <td class="status-completed">+8,500,000 VND</td>
-                    </tr>
-                    <tr>
-                        <td>VHM</td>
-                        <td>CTCP Vinhomes</td>
-                        <td>800</td>
-                        <td>80,000</td>
-                        <td>74,500</td>
-                        <td class="type-sell">-6.9%</td>
-                        <td>59,600,000 VND</td>
-                        <td class="status-pending">-4,400,000 VND</td>
-                    </tr> -->
                 </tbody>
             </table>
         </div>
@@ -221,42 +159,21 @@
                     </tr>
                 </thead>
                 <tbody>
+                    {% for transaction in recent_transactions %}
                     <tr>
-                        <td>15/03/2025</td>
-                        <td>VNM</td>
-                        <td class="type-buy">Mua</td>
-                        <td>500</td>
-                        <td>82,500 VND</td>
-                        <td>41,250,000 VND</td>
-                        <td class="status-completed">Hoàn thành</td>
+                        <td>{{ transaction.date }}</td>
+                        <td>{{ transaction.stock_code }}</td>
+                        <td class="{% if transaction.is_sell %} type-sell {% else %} type-buy {% endif %}">{{ transaction.status_sell }}</td>
+                        <td>{{ transaction.amount }}</td>
+                        <td>{{ transaction.price|intcomma }} VND</td>
+                        <td>{{ transaction.total_price|intcomma }} VND</td>
+                        <td class="{% if transaction.is_successful %} status-completed {% else %} status-pending {% endif %}">{{ transaction.status_completed }}</td>
                     </tr>
+                    {% empty %}
                     <tr>
-                        <td>14/03/2025</td>
-                        <td>VHM</td>
-                        <td class="type-buy">Mua</td>
-                        <td>300</td>
-                        <td>74,500 VND</td>
-                        <td>22,350,000 VND</td>
-                        <td class="status-completed">Hoàn thành</td>
+                        <td colspan="6" class="no-data">Chưa có giao dịch cổ phiếu nào</td>
                     </tr>
-                    <tr>
-                        <td>12/03/2025</td>
-                        <td>MSN</td>
-                        <td class="type-sell">Bán</td>
-                        <td>400</td>
-                        <td>98,000 VND</td>
-                        <td>39,200,000 VND</td>
-                        <td class="status-completed">Hoàn thành</td>
-                    </tr>
-                    <tr>
-                        <td>10/03/2025</td>
-                        <td>FPT</td>
-                        <td class="type-buy">Mua</td>
-                        <td>200</td>
-                        <td>98,500 VND</td>
-                        <td>19,700,000 VND</td>
-                        <td class="status-completed">Hoàn thành</td>
-                    </tr>
+                    {% endfor %}
                 </tbody>
             </table>
         </div>

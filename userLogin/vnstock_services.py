@@ -1,3 +1,6 @@
+from datetime import datetime
+
+
 from vnstock import Vnstock
 
 
@@ -25,3 +28,13 @@ def get_refer_price(stock_code):
     except Exception as e:
         return f'Không tìm thấy mã cổ phiếu {stock_code}!'
 
+
+# ===== Lấy thông tin bảng giá thị trường ====
+def get_price_board():
+    return stock.trading.price_board(symbols_list=list(stock.listing.all_symbols().ticker.values))
+
+
+# ==== Lấy giá lịch sử ====
+def get_historical_data(stock_code):
+    today = datetime.now().strftime('%Y-%m-%d')
+    return Vnstock().stock(symbol=stock_code, source='VCI').quote.history(start='2000-01-01', end=today)

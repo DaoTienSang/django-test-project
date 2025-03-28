@@ -11,7 +11,7 @@ from django.http import Http404
 from accounts.models import User
 from .models import WalletTransactions, StockTransactions, UserBankAccounts, UserAssets
 
-from .vnstock_services import stock, get_ticker_companyname, get_refer_price
+from .vnstock_services import stock, get_ticker_companyname, get_refer_price, get_price_board
 
 import random
 import string
@@ -93,25 +93,33 @@ def assets_management(request):
             'profit_loss': profit_loss,
         })
     
-    # Lấy 10 giao dịch gần nhất
+    # Lấy 5 giao dịch gần nhất
     recent_transactions = StockTransactions.objects.filter(
         user=request.user
-    ).order_by('-time')[:10]
+    ).order_by('-time')[:5]
     
     # Thêm thông tin về tên công ty và tổng giá trị
     for transaction in recent_transactions:
-        transaction.organ_name = ticker_to_company.get(transaction.stock_code, "Không có thông tin")
-        transaction.total_value = transaction.price * transaction.amount
+        transaction.date = transaction.time.strftime("%d/%m/%Y")
+        transaction.total_price = transaction.price * transaction.amount
+        transaction.status_sell = 'Mua'
+        if transaction.is_sell:
+            transaction.status_sell = 'Bán'
+        transaction.status_completed = 'Đang xử lý'
+        if transaction.is_successful:
+            transaction.status_completed = 'Hoàn thành'
+        
+    #     transaction.organ_name = ticker_to_company.get(transaction.stock_code, "Không có thông tin")
+    #     transaction.total_value = transaction.price * transaction.amount
     
     context = {
-        # 'user_balance': user_balance,
         'portfolio_value': portfolio_value,
         'total_profit_loss': total_profit_loss,
         'number_of_stock':len(user_stocks),
         'number_profit_stock': number_profit_stock,
         'number_loss_stock':len(user_stocks)-number_profit_stock,
         'portfolios': portfolios,
-        # 'recent_transactions': recent_transactions,
+        'recent_transactions': recent_transactions,
     }
     
     return render(request, 'userLogin/assets_management.html', context)
@@ -295,11 +303,6 @@ def add_bank_account(request):
     return render(request, '404.html')
 
 
-# Lấy nhóm các lịch sử giao dịch mua theo mã, giá cổ phiếu
-# user_assets = StockTransactions.objects.filter(is_sell=False, user=user).values("user", "stock_code", "is_sell", "price").annotate(total_amount=Sum('amount'))
-# for a in user_assets:
-#     print(a.get("stock_code"))
-
 
 # - MANAGE TRADING
 @login_required
@@ -442,13 +445,13 @@ def sell_stock(request):
         try:
             # Lấy tất cả các bản ghi của user cho mã cổ phiếu này
             user_assets = UserAssets.objects.filter(user=user, stock_code=stock_code).order_by('id')
-            print('='*100)
-            print(user_assets)
+            # print('='*100)
+            # print(user_assets)
             
             
             # Tính tổng số lượng cổ phiếu mà user đang sở hữu
             total_owned = user_assets.aggregate(total=Sum('amount'))['total'] or 0
-            print(total_owned)
+            # print(total_owned)
             
             # Kiểm tra người dùng có đủ cổ phiếu để bán không
             if total_owned < stock_amount:
@@ -503,3 +506,13 @@ def sell_stock(request):
     return render(request, '404.html')
 
 
+
+# ============ MARKET =======
+@login_required
+def market(request):
+    price_board = get_price_board()
+    context = {
+        "price_board_json": price_board.to_json(orient='split'),
+        
+    }
+    return render(request, 'userLogin/market.html', context)

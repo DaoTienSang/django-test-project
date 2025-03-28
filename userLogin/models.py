@@ -34,7 +34,7 @@ class StockTransactions(models.Model):
     def __str__(self):
         action = "Sold" if self.is_sell else "Bought"
         return f"{self.user.username} {action} {self.amount} {self.stock_code} at {self.price}"
-    
+
 
 
 # ========= BANK ACCOUNT ==================
