@@ -96,7 +96,7 @@
             let table_body_content = "<tbody>";
             for (var i=0; i<data.length; i++){
                 if (data[i][symbol_index]){
-                    table_body_content += "<tr>";
+                    table_body_content += "<tr title='Click để xem biểu đồ giá'>";
                     table_body_content += `<td>${data[i][symbol_index]}</td>`;
                     table_body_content += `<td>${formatPrice(data[i][ceiling_index])}</td>`;
                     table_body_content += `<td>${formatPrice(data[i][floor_index])}</td>`;
